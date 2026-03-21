@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.work | Marketing Films & Creative Production</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --accent-green: #9dfc5d; /* Matching your logo outline */
+            --text-color: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Subtle cinematic background glow */
+        .gradient-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .logo {
+            width: 180px;
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .tag {
+            border: 1px solid #333;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-green);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 35px;
+            background-color: var(--accent-green);
+            color: #000;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .cta-button:hover {
+            box-shadow: 0 0 20px rgba(157, 252, 93, 0.4);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gradient-bg"></div>
+
+    <div class="container">
+        <img src="ndw v2.png" alt=".work Logo" class="logo">
+        
+        <h1>Creative Engine Room.</h1>
+        
+        <p>Crafting high-impact marketing films and end-to-end video production pipelines for the world's most ambitious creatives.</p>
+
+        <div class="tag-container">
+            <div class="tag">Marketing Films</div>
+            <div class="tag">Creative Campaigns</div>
+            <div class="tag">Full-Scale Production</div>
+        </div>
+
+        <a href="mailto:hello@yourdomain.work" class="cta-button">Start a Project</a>
+    </div>
+
+</body>
+</html>
