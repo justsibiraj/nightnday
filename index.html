@@ -64,7 +64,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 2.5rem;
+            padding: 1.5rem sm:padding: 2.5rem;
             box-sizing: border-box;
         }
 
@@ -212,23 +212,32 @@
 
     <!-- Static UI Layer -->
     <div class="ui-layer">
-        <header class="grid grid-cols-3 items-center w-full pointer-events-auto">
-            <div class="justify-self-start flex gap-8">
-                <a href="#projects" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
+        <header class="flex flex-row items-center justify-center gap-4 sm:gap-12 md:gap-16 lg:gap-24 w-full pointer-events-auto py-2">
+            <!-- Left Navigation Group -->
+            <div class="flex items-center gap-4 sm:gap-8 md:gap-12">
+                <a href="#projects" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
                     Projects
                 </a>
-                <a href="#services" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">
+                <a href="#services" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
                     Services
                 </a>
             </div>
             
-            <div class="justify-self-center flex justify-center">
-                <img id="header-logo" src="ndw logo 00.png" alt="NIGHT & DAY" class="h-16 object-contain transition-opacity duration-700" onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[0.9rem] tracking-[0.2em] font-serif uppercase text-white transition-opacity duration-700';">
+            <!-- Centralized Logo Container -->
+            <div class="flex justify-center items-center px-4 md:px-10">
+                <img id="header-logo" src="ndw logo 00.png" alt="NIGHT & DAY" 
+                     class="h-16 sm:h-24 md:h-32 lg:h-36 w-auto max-w-[140px] sm:max-w-[240px] md:max-w-[360px] object-contain transition-all duration-700 hover:scale-105 active:scale-95" 
+                     onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[1rem] sm:text-[1.6rem] md:text-[2.2rem] lg:text-[2.6rem] tracking-[0.3em] font-serif uppercase text-white font-bold transition-opacity duration-700 hover:text-[#8ac53f] transition-colors duration-300 px-2 text-center whitespace-nowrap';">
             </div>
 
-            <div class="justify-self-end flex gap-8">
-                <a href="#team" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">Team</a>
-                <a href="#about" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">About Us</a>
+            <!-- Right Navigation Group -->
+            <div class="flex items-center gap-4 sm:gap-8 md:gap-12">
+                <a href="#team" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
+                    Team
+                </a>
+                <a href="#about" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
+                    About Us
+                </a>
             </div>
         </header>
         
@@ -745,8 +754,7 @@
                     campaignHint.style.opacity = '0';
                 }
 
-                // --- 1. CAMERA & INTRO TUNNEL LOGIC ---
-                // --- 1. CAMERA LOGIC ---
+                // --- CAMERA LOGIC ---
                 let targetCamZ = 45; // Start position (at Logo)
                 let targetCamY = 0;
                 let targetCamX = 0;
