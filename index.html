@@ -200,7 +200,7 @@
     <!-- Loading Screen -->
     <div id="loader">
         <div class="spinner"></div>
-        <h1 class="text-sm tracking-[0.3em] font-light text-gray-300">INITIALIZING</h1>
+        <h1 class="text-sm tracking-[0.3em] font-light text-gray-300">INITIALIZING SCENE</h1>
     </div>
 
     <div class="vignette"></div>
@@ -296,8 +296,8 @@
             const CONFIG = {
                 introLogoText: "NIGHT & DAY",
                 introLogoImage: "ndw logo 00.png",
-                finalPitchText: "NIGHT & DAY", // Updated from "FILM POSITIONING"
-                finalPitchImage: "ndw logo 00.png",
+                finalPitchText: "NIGHT & DAY", // Final logo backup text
+                finalPitchImage: "ndw logo 00.png", // Direct reference to prevent squishing of your brand logo!
                 fontPrimary: '"Inter", sans-serif',
                 fontSecondary: '"Cinzel", serif'
             };
@@ -574,17 +574,30 @@
             }
             scene.add(starMesh);
 
-            // Final Glowing Pitch
+            // Final Glowing Pitch Plane Setup
             let pitchMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
-            const pitchGeo = new THREE.PlaneGeometry(35, 8.75);
+            const pitchGeo = new THREE.PlaneGeometry(35, 8.75); // base 4:1 aspect geometry
             const pitchPlane = new THREE.Mesh(pitchGeo, pitchMat);
+
+            // Aspect ratio protection state!
+            pitchPlane.userData = {
+                baseScaleX: 1.0,
+                baseScaleY: 1.0,
+                baseScaleZ: 1.0
+            };
 
             if (CONFIG.finalPitchImage) {
                 textureLoader.load(CONFIG.finalPitchImage, (tex) => {
                     pitchMat.map = tex;
                     pitchMat.needsUpdate = true;
+                    
+                    // Prevent squishing by adjusting geometry scale multipliers based on actual file parameters!
                     const imgAspect = tex.image.width / tex.image.height;
-                    pitchPlane.scale.y = (35 / imgAspect) / 8.75;
+                    const targetHeight = 35 / imgAspect;
+                    
+                    // Store proportions securely in userData so render loop transformations respect them
+                    pitchPlane.userData.baseScaleY = targetHeight / 8.75;
+                    pitchPlane.scale.set(pitchPlane.userData.baseScaleX, pitchPlane.userData.baseScaleY, 1.0);
                 });
             } else {
                 pitchMat.map = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
@@ -920,16 +933,18 @@
                     starMesh.instanceMatrix.needsUpdate = true;
                 }
 
-                // --- FINAL GLOW LOGIC ---
+                // --- FINAL GLOW LOGIC (Proportion-Safeguarded) ---
                 const distToFinal = pitchPlane.position.z - camera.position.z;
                 if (Math.abs(distToFinal) < 60) {
                     const glowPulse = 0.7 + Math.sin(elapsedTime * 2) * 0.3;
                     pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, glowPulse, 0.05);
                     
-                    if (scrollProgress > 0.75) {
-                        const scale = 1 + ((scrollProgress - 0.75) * 0.4);
-                        pitchPlane.scale.set(scale, scale, scale);
-                    }
+                    const scaleFactor = (scrollProgress > 0.75) ? (1 + ((scrollProgress - 0.75) * 0.4)) : 1.0;
+                    
+                    // Multiply target scale factor by base aspect ratio constants to ensure it NEVER squishes!
+                    const targetSX = pitchPlane.userData.baseScaleX * scaleFactor;
+                    const targetSY = pitchPlane.userData.baseScaleY * scaleFactor;
+                    pitchPlane.scale.set(targetSX, targetSY, scaleFactor);
                 } else {
                     pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, 0, 0.1);
                 }
