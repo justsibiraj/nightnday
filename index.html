@@ -195,7 +195,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="antialiased selection:bg-white selection:text-black">
+<body class="antialiased selection:bg-[#8ac53f] selection:text-black">
 
     <!-- Loading Screen -->
     <div id="loader">
@@ -212,14 +212,23 @@
 
     <!-- Static UI Layer -->
     <div class="ui-layer">
-        <header class="flex justify-between items-center w-full pointer-events-auto">
-            <a href="#projects" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
-                Projects
-            </a>
-            <div class="flex gap-8">
-                <a href="#about" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors">About Us</a>
-                <a href="#team" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors">Team</a>
-                <a href="#services" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors">Services</a>
+        <header class="grid grid-cols-3 items-center w-full pointer-events-auto">
+            <div class="justify-self-start flex gap-8">
+                <a href="#projects" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
+                    Projects
+                </a>
+                <a href="#services" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">
+                    Services
+                </a>
+            </div>
+            
+            <div class="justify-self-center flex justify-center">
+                <img id="header-logo" src="ndw logo 00.png" alt="NIGHT & DAY" class="h-6 object-contain transition-opacity duration-700" onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[0.9rem] tracking-[0.2em] font-serif uppercase text-white transition-opacity duration-700';">
+            </div>
+
+            <div class="justify-self-end flex gap-8">
+                <a href="#team" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">Team</a>
+                <a href="#about" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">About Us</a>
             </div>
         </header>
         
@@ -236,7 +245,7 @@
 
     <!-- Scroll Progress -->
     <div class="progress-container">
-        <div class="progress-bar" id="progress-bar"></div>
+        <div class="progress-bar bg-[#8ac53f] shadow-[0_0_10px_rgba(138,197,63,0.5)]" id="progress-bar"></div>
     </div>
 
     <!-- Dynamic Cassette Details -->
@@ -247,7 +256,7 @@
 
     <!-- Final Footer Section -->
     <div class="footer-section">
-        <button class="px-10 py-5 bg-white text-black font-bold tracking-[0.2em] text-sm uppercase rounded-full hover:scale-105 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+        <button class="px-10 py-5 bg-white text-black font-bold tracking-[0.2em] text-sm uppercase rounded-full hover:scale-105 hover:shadow-[0_0_25px_rgba(138,197,63,0.4)] transition-all duration-300">
             Connect With Us
         </button>
     </div>
@@ -403,6 +412,21 @@
                     title: 'THE BATMAN', color: '#4a0e0e', 
                     coverImage: null, spineImage: null,
                     activities: "Creative Direction • Meme Marketing • Global Scale Rollout" 
+                },
+                { 
+                    title: 'EEAAO', color: '#421a42', 
+                    coverImage: null, spineImage: null,
+                    activities: "Viral Marketing • Community Engagement • Award Strategy" 
+                },
+                { 
+                    title: 'BARBIE', color: '#8a2b5b', 
+                    coverImage: null, spineImage: null,
+                    activities: "Brand Collaborations • Social Dominance • Event Activations" 
+                },
+                { 
+                    title: 'BLADE RUNNER', color: '#7a3e14', 
+                    coverImage: null, spineImage: null,
+                    activities: "Teaser Campaign • Visual Storytelling • Niche Targeting" 
                 }
             ];
 
@@ -467,38 +491,21 @@
             });
 
             // Add a subtle shelf base
-            const shelfGeo = new THREE.BoxGeometry(10, 0.2, 4);
+            const shelfGeo = new THREE.BoxGeometry(14, 0.2, 4); // Increased width to support 8 items
             const shelfMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.9, transparent: true, opacity: 0 });
             const shelfMesh = new THREE.Mesh(shelfGeo, shelfMat);
             shelfMesh.position.set(0, -2.2, 0);
             shelfMesh.receiveShadow = true;
             shelfGroup.add(shelfMesh);
 
-            // Cinematic Intro Background (The accidental "Flash/Letterbox" effect)
-            const introBgGeo = new THREE.PlaneGeometry(120, 25);
-            // Soft white/silver color that interacts beautifully with the dark fog and CSS vignette
-            const introBgMat = new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true, opacity: 0 }); 
+            // --- CINEMATIC INTRO TUNNEL ---
+            // The White Background Plane (Letterbox effect)
+            // Starts at opacity 1.0 so the white block is bright and visible immediately on load
+            const introBgGeo = new THREE.PlaneGeometry(50, 7); // Reduced height from 12 to 7 for precise top/bottom letterbox margins
+            const introBgMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1.0 }); 
             const introBgPlane = new THREE.Mesh(introBgGeo, introBgMat);
-            introBgPlane.position.set(0, 0, 29); // Positioned exactly 1 unit behind the logo
+            introBgPlane.position.set(0, 0, 30); 
             scene.add(introBgPlane);
-
-            // Intro Logo Plane
-            let logoMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending });
-            const logoGeo = new THREE.PlaneGeometry(30, 7.5);
-            const logoPlane = new THREE.Mesh(logoGeo, logoMat);
-
-            if (CONFIG.introLogoImage) {
-                textureLoader.load(CONFIG.introLogoImage, (tex) => {
-                    logoMat.map = tex;
-                    logoMat.needsUpdate = true;
-                    const imgAspect = tex.image.width / tex.image.height;
-                    logoPlane.scale.y = (30 / imgAspect) / 7.5; 
-                });
-            } else {
-                logoMat.map = createTextTexture(CONFIG.introLogoText, 2048, 512, 'transparent', '#ffffff', false, true);
-            }
-            logoPlane.position.set(0, 0, 30); // Start way in front of the shelf
-            scene.add(logoPlane);
 
             const services = [
                 { text: "Strategy & Positioning", image: null }, 
@@ -603,8 +610,8 @@
             spotLight.shadow.mapSize.height = 1024;
             scene.add(spotLight);
 
-            // Cinematic Rim Light (Blueish)
-            const rimLight = new THREE.PointLight(0x4477ff, 3, 40);
+            // Cinematic Rim Light (Now using #8ac53f brand color)
+            const rimLight = new THREE.PointLight(0x8ac53f, 3, 40);
             rimLight.position.set(-8, -2, -5);
             scene.add(rimLight);
             
@@ -707,6 +714,7 @@
 
             const clock = new THREE.Clock();
             let lastScrollProgress = 0;
+            let currentStarStretch = 1; // Track star stretch for smooth braking
 
             function animate() {
                 requestAnimationFrame(animate);
@@ -717,6 +725,18 @@
                 const scrollDelta = Math.abs(scrollProgress - lastScrollProgress);
                 lastScrollProgress = scrollProgress;
 
+                // --- HEADER LOGO FADE LOGIC ---
+                const headerLogo = document.getElementById('header-logo');
+                if (headerLogo) {
+                    // Hide logo dynamically right as the letterbox starts expanding (0.01)
+                    // Bring it back exactly as the shelf comes fully into view (0.13)
+                    if (scrollProgress > 0.01 && scrollProgress < 0.13) {
+                        headerLogo.style.opacity = '0';
+                    } else {
+                        headerLogo.style.opacity = '1';
+                    }
+                }
+
                 // --- UI Hint Logic ---
                 const campaignHint = document.getElementById('campaign-hint');
                 if (scrollProgress >= 0.14 && scrollProgress <= 0.26) {
@@ -725,28 +745,39 @@
                     campaignHint.style.opacity = '0';
                 }
 
+                // --- 1. CAMERA & INTRO TUNNEL LOGIC ---
                 // --- 1. CAMERA LOGIC ---
                 let targetCamZ = 45; // Start position (at Logo)
                 let targetCamY = 0;
                 let targetCamX = 0;
                 
+                let targetTunnelOpacity = 1.0;
+                let targetTunnelScale = 1;
+
                 if (scrollProgress < 0.15) {
-                    // Phase 0: Logo to Shelf View
-                    targetCamZ = 45 - ((scrollProgress / 0.15) * 33); // Moves from Z 45 to Z 12
-                    logoPlane.material.opacity = lerp(logoPlane.material.opacity, 1 - (scrollProgress * 10), 0.1);
-                    
-                    // Only fade in the tunnel glow once scrolling starts
-                    const targetTunnelOpacity = (scrollProgress > 0.02) ? 0.6 : 0;
-                    introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, targetTunnelOpacity, 0.1);
-                    
-                    // Expand the cinematic background vertically
-                    introBgPlane.scale.y = lerp(introBgPlane.scale.y, 1 + (scrollProgress * 15), 0.1);
+                    // Phase 0: Start to Shelf View with smooth mathematical easing
+                    const localProg = scrollProgress / 0.15;
+                    const camEase = 1 - Math.pow(1 - localProg, 3); // Cubic ease out for buttery smooth camera landing
+
+                    targetCamZ = 45 - (camEase * 33); // Moves from Z 45 to Z 12 smoothly
+
+                    // Expand the background vertically to engulf the screen
+                    targetTunnelScale = 1 + (camEase * 40); 
+
+                    // Start fading the white into the black vignette much sooner for a cohesive blend
+                    if (scrollProgress > 0.03) {
+                        const fadeProg = Math.min(1, (scrollProgress - 0.03) / 0.12);
+                        // Using quadratic ease for a slow, gentle transition from white to black
+                        const alphaEase = Math.pow(fadeProg, 2); 
+                        targetTunnelOpacity = 1.0 - alphaEase;
+                    } else {
+                        targetTunnelOpacity = 1.0;
+                    }
                 } 
                 else if (scrollProgress >= 0.15 && scrollProgress < 0.3) {
                     // Phase 1: Hold at Shelf
                     targetCamZ = 12;
-                    logoPlane.material.opacity = lerp(logoPlane.material.opacity, 0, 0.1);
-                    introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, 0, 0.1);
+                    targetTunnelOpacity = 0;
                 }
                 else if (scrollProgress >= 0.3 && scrollProgress < 0.75) {
                     // Phase 2: Fly straight through the Void
@@ -756,7 +787,6 @@
                     targetCamZ = 12 - (easeProg * 132); // Fly deep from 12 to -120
                     targetCamY = 0; // Straight flight
                     targetCamX = 0; 
-                    logoPlane.material.opacity = 0;
                 } 
                 else if (scrollProgress >= 0.75 && scrollProgress < 0.85) {
                     // Phase 3: Push into Final Pitch Text (Landed feeling)
@@ -778,6 +808,10 @@
 
                 // Look steadily forward
                 camera.lookAt(0, 0, camera.position.z - 20);
+
+                // Apply intro letterbox scaling and fading
+                introBgPlane.scale.y = lerp(introBgPlane.scale.y, targetTunnelScale, 0.1);
+                introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, targetTunnelOpacity, 0.1);
 
                 // --- 2. SHELF FADE IN & CASSETTE PARTING LOGIC ---
                 // Fade in shelf materials smoothly after logo passes
@@ -845,25 +879,40 @@
                 });
 
                 // --- 3.5 HYPERSPACE LOGIC ---
-                // Warp effect stops before we hit the final pitch text to give a sense of landing
-                let isWarping = scrollProgress >= 0.28 && scrollProgress < 0.75;
-                starMat.opacity = lerp(starMat.opacity, isWarping ? 0.6 : 0, 0.05);
+                // Warp effect stops the precise moment the final pitch text becomes visible
+                let isWarping = scrollProgress >= 0.28 && scrollProgress < 0.65;
+                let isDeepSpace = scrollProgress >= 0.28;
                 
-                // Speed increases dramatically based on how fast the user scrolls
-                let baseWarpSpeed = isWarping ? 0.3 : 0.02;
-                let activeWarpSpeed = baseWarpSpeed + (scrollDelta * 50);
+                // Keep stars visible after landing, just slightly dimmer
+                let targetStarOpacity = 0;
+                if (isWarping) {
+                    targetStarOpacity = 0.6;
+                } else if (isDeepSpace) {
+                    targetStarOpacity = 0.3; // Dimmer stars after dropping out of warp
+                }
+
+                starMat.opacity = lerp(starMat.opacity, targetStarOpacity, 0.05);
+                
+                // Speed increases dramatically based on how fast the user scrolls, but ONLY when warping
+                let baseWarpSpeed = isWarping ? 0.3 : 0.005; // Drop to very slow drift when not warping
+                let activeWarpSpeed = baseWarpSpeed + (isWarping ? (scrollDelta * 50) : 0);
+
+                // Smoothly stretch and un-stretch the stars
+                let targetZScale = isWarping ? (1 + activeWarpSpeed * 40) : 1;
+                currentStarStretch = lerp(currentStarStretch, targetZScale, 0.1);
 
                 if (starMat.opacity > 0.01) {
                     for(let i=0; i<starCount; i++) {
                         let data = starData[i];
-                        data.z += data.speed + activeWarpSpeed; // Move towards camera
+                        // Slow down the forward movement significantly when not warping
+                        data.z += (data.speed * (isWarping ? 1 : 0.2)) + activeWarpSpeed; 
                         
                         if (data.z > camera.position.z) {
                             data.z = camera.position.z - 250; // Loop back to far end
                         }
                         
                         dummy.position.set(data.x, data.y, data.z);
-                        dummy.scale.set(1, 1, 1 + activeWarpSpeed * 40); // Stretch based on current speed
+                        dummy.scale.set(1, 1, currentStarStretch); // Apply stretched or dot scale
                         dummy.updateMatrix();
                         starMesh.setMatrixAt(i, dummy.matrix);
                     }
