@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap');
 
         :root {
             --bg-color: #030303;
@@ -212,7 +212,7 @@
 
     <!-- Static UI Layer -->
     <div class="ui-layer">
-        <header class="flex flex-row items-center justify-center gap-4 sm:gap-12 md:gap-16 lg:gap-24 w-full pointer-events-auto py-2">
+        <header class="flex flex-row items-center justify-center gap-4 sm:gap-12 md:gap-16 lg:gap-24 w-full pointer-events-auto py-2 transition-opacity duration-1000 opacity-0">
             <!-- Left Navigation Group -->
             <div class="flex items-center gap-4 sm:gap-8 md:gap-12">
                 <a href="#projects" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
@@ -223,11 +223,11 @@
                 </a>
             </div>
             
-            <!-- Centralized Logo Container -->
+            <!-- Centralized Logo Container (30% larger, matches image_0f6bfd.png) -->
             <div class="flex justify-center items-center px-4 md:px-10">
                 <img id="header-logo" src="ndw logo 00.png" alt="NIGHT & DAY" 
-                     class="h-16 sm:h-24 md:h-32 lg:h-36 w-auto max-w-[140px] sm:max-w-[240px] md:max-w-[360px] object-contain transition-all duration-700 hover:scale-105 active:scale-95" 
-                     onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[1rem] sm:text-[1.6rem] md:text-[2.2rem] lg:text-[2.6rem] tracking-[0.3em] font-serif uppercase text-white font-bold transition-opacity duration-700 hover:text-[#8ac53f] transition-colors duration-300 px-2 text-center whitespace-nowrap';">
+                     class="h-[5.2rem] sm:h-[7.8rem] md:h-[10.4rem] lg:h-[11.7rem] w-auto max-w-[180px] sm:max-w-[310px] md:max-w-[470px] lg:max-w-[520px] object-contain transition-all duration-700 hover:scale-105 active:scale-95" 
+                     onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[1.3rem] sm:text-[2.1rem] md:text-[2.8rem] lg:text-[3.4rem] tracking-[0.3em] font-serif uppercase text-white font-bold transition-opacity duration-700 hover:text-[#8ac53f] transition-colors duration-300 px-2 text-center whitespace-nowrap';">
             </div>
 
             <!-- Right Navigation Group -->
@@ -240,6 +240,14 @@
                 </a>
             </div>
         </header>
+
+        <!-- Handwritten Intro Text Overlay (Shifted higher to prevent overlap, matches image_0fcd99.png) -->
+        <div id="intro-handwritten-text-container" class="absolute inset-x-0 top-[6%] sm:top-[8%] flex flex-col items-center justify-center pointer-events-none z-[5]">
+            <!-- Text 1: The Beginning -->
+            <p id="intro-text-1" class="text-white text-xl sm:text-2xl md:text-4xl lg:text-5xl font-light tracking-widest text-center px-6 transition-opacity duration-300" style="font-family: 'Caveat', cursive;">
+                it all begins with a dot
+            </p>
+        </div>
         
         <div class="scroll-indicator" id="scroll-hint">
             <div class="mouse-icon"><div class="mouse-wheel"></div></div>
@@ -285,12 +293,11 @@
             scene.fog = new THREE.FogExp2(0x030303, 0.012); // Slightly deeper fog
 
             // --- CENTRAL CONFIGURATION ---
-            // Customize text, final copy, and fonts here
             const CONFIG = {
                 introLogoText: "NIGHT & DAY",
-                introLogoImage: "ndw logo 00.png", // e.g., 'path/to/logo.png' (replaces intro text if set)
+                introLogoImage: "ndw logo 00.png",
                 finalPitchText: "FILM POSITIONING",
-                finalPitchImage: null, // e.g., 'path/to/pitch.png' (replaces final text if set)
+                finalPitchImage: null,
                 fontPrimary: '"Inter", sans-serif',
                 fontSecondary: '"Cinzel", serif'
             };
@@ -313,11 +320,9 @@
                 ctxCanvas.height = height;
                 const ctx = ctxCanvas.getContext('2d');
 
-                // Background fill
                 ctx.fillStyle = bgColor;
                 ctx.fillRect(0, 0, width, height);
 
-                // Add grain/noise for realism if not transparent
                 if (bgColor !== 'transparent') {
                     for(let i=0; i< (width*height)*0.05; i++) {
                         ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
@@ -338,36 +343,27 @@
                 }
 
                 if (isSpine) {
-                    // Draw Spine
                     ctx.save();
                     ctx.translate(width / 2, height / 2);
                     ctx.rotate(-Math.PI / 2);
                     ctx.fillText(title, 0, 0);
                     ctx.restore();
                     
-                    // Spine details (Studio logo placeholder)
                     ctx.font = '14px Arial';
                     ctx.fillText('N&D', width / 2, height - 30);
-                    // Spine visual line
                     ctx.fillStyle = textColor;
                     ctx.fillRect(width/2 - 20, 30, 40, 2);
                 } else {
-                    // Draw Cover
                     if (!isGlow && bgColor !== 'transparent') {
-                        // Poster Border
                         ctx.strokeStyle = 'rgba(255,255,255,0.1)';
                         ctx.lineWidth = 4;
                         ctx.strokeRect(20, 20, width - 40, height - 40);
-
-                        // Main Title
                         ctx.fillText(title, width / 2, height / 2 - 40);
                         
-                        // Faux Credits
                         ctx.font = '300 16px "Inter", sans-serif';
                         ctx.fillStyle = 'rgba(255,255,255,0.5)';
                         ctx.fillText('A NIGHT & DAY STUDIOS PRODUCTION', width / 2, height / 2 + 60);
                         
-                        // Faux Barcode & Rating
                         ctx.fillStyle = '#fff';
                         for(let i=0; i<15; i++) {
                             let w = Math.random() * 6 + 1;
@@ -379,7 +375,6 @@
                         ctx.lineWidth = 2;
                         ctx.strokeRect(width - 75, height - 72, 30, 30);
                     } else {
-                        // Just text (for services or final glow)
                         ctx.fillText(title, width / 2, height / 2);
                     }
                 }
@@ -394,8 +389,6 @@
             const shelfGroup = new THREE.Group();
             scene.add(shelfGroup);
 
-            // You can now customize images by passing URL strings to coverImage / spineImage 
-            // e.g., coverImage: 'path/to/dune-cover.jpg'
             const films = [
                 { 
                     title: 'DUNE', color: '#8c593b', 
@@ -446,7 +439,6 @@
             const spacing = 1.0;
             const startX = -((films.length - 1) * spacing) / 2;
 
-            // Cassette shell material (dark, slightly reflective plastic)
             const plasticMaterial = new THREE.MeshStandardMaterial({ 
                 color: 0x0a0a0a, 
                 roughness: 0.8, 
@@ -457,10 +449,8 @@
 
             films.forEach((film, index) => {
                 const geometry = new THREE.BoxGeometry(cassetteWidth, cassetteHeight, cassetteDepth);
-                
                 let spineTexture, coverTexture;
 
-                // Load custom images if provided in config, otherwise generate text canvas
                 if (film.spineImage) {
                     spineTexture = textureLoader.load(film.spineImage);
                 } else {
@@ -476,7 +466,6 @@
                 const spineMaterial = new THREE.MeshStandardMaterial({ map: spineTexture, roughness: 0.4, transparent: true, opacity: 0 });
                 const coverMaterial = new THREE.MeshStandardMaterial({ map: coverTexture, roughness: 0.3, transparent: true, opacity: 0 });
 
-                // Box faces: Right, Left, Top, Bottom, Front(Spine), Back
                 const materials = [ coverMaterial, plasticMaterial, plasticMaterial, plasticMaterial, spineMaterial, plasticMaterial ];
 
                 const cassette = new THREE.Mesh(geometry, materials);
@@ -486,11 +475,10 @@
                 const xPos = startX + (index * spacing);
                 cassette.position.set(xPos, 0, 0);
                 
-                // Store state for animations
                 cassette.userData = {
                     baseX: xPos, baseY: 0, baseZ: 0, baseRotY: 0,
                     targetZ: 0, targetRotY: 0,
-                    state: 'idle', // idle, hover, active
+                    state: 'idle',
                     title: film.title,
                     activities: film.activities
                 };
@@ -500,7 +488,7 @@
             });
 
             // Add a subtle shelf base
-            const shelfGeo = new THREE.BoxGeometry(14, 0.2, 4); // Increased width to support 8 items
+            const shelfGeo = new THREE.BoxGeometry(14, 0.2, 4);
             const shelfMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.9, transparent: true, opacity: 0 });
             const shelfMesh = new THREE.Mesh(shelfGeo, shelfMat);
             shelfMesh.position.set(0, -2.2, 0);
@@ -508,13 +496,18 @@
             shelfGroup.add(shelfMesh);
 
             // --- CINEMATIC INTRO TUNNEL ---
-            // The White Background Plane (Letterbox effect)
-            // Starts at opacity 1.0 so the white block is bright and visible immediately on load
-            const introBgGeo = new THREE.PlaneGeometry(50, 7); // Reduced height from 12 to 7 for precise top/bottom letterbox margins
+            const introBgGeo = new THREE.PlaneGeometry(50, 7);
             const introBgMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1.0 }); 
             const introBgPlane = new THREE.Mesh(introBgGeo, introBgMat);
             introBgPlane.position.set(0, 0, 30); 
             scene.add(introBgPlane);
+
+            // Dynamic transition circle
+            const dotGeo = new THREE.CircleGeometry(0.3, 64);
+            const dotMat = new THREE.MeshBasicMaterial({ color: 0x030303, transparent: true, opacity: 1.0 });
+            const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+            dotMesh.position.set(0, 0, 30.1); 
+            scene.add(dotMesh);
 
             const services = [
                 { text: "Strategy & Positioning", image: null }, 
@@ -538,7 +531,6 @@
                     textureLoader.load(service.image, (tex) => {
                         mat.map = tex;
                         mat.needsUpdate = true;
-                        // Dynamically scale floating images to prevent squeezing
                         const imgAspect = tex.image.width / tex.image.height;
                         plane.scale.y = (16 / imgAspect) / 4;
                     });
@@ -546,22 +538,20 @@
                     mat.map = createTextTexture(service.text, 1024, 256, 'transparent', 'rgba(255,255,255,0.8)', false);
                 }
                 
-                // Spiral distribution keeping the center tunnel clear
-                const zPos = -15 - (i * 12); // Paced to appear much sooner after the shelf
+                const zPos = -15 - (i * 12);
                 const angle = i * Math.PI * 0.7;
-                const radius = 6 + Math.random() * 6; // Push text outward so we don't clip right through it
+                const radius = 6 + Math.random() * 6;
                 const xPos = Math.cos(angle) * radius;
                 const yPos = Math.sin(angle) * radius * 0.6;
                 
                 plane.position.set(xPos, yPos, zPos);
-                // Make them face the camera generally
                 plane.lookAt(0, 0, zPos + 10);
                 
                 scene.add(plane);
                 textPlanes.push({ mesh: plane, baseY: yPos, targetY: yPos });
             });
 
-            // --- HYPERSPACE STARFIELD SETUP ---
+            // --- HYPERSPACE STARFIELD ---
             const starCount = 600;
             const starGeo = new THREE.BoxGeometry(0.05, 0.05, 2);
             const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
@@ -571,7 +561,7 @@
             const starData = [];
             for(let i=0; i<starCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const radius = 3 + Math.random() * 25; // Tunnel hole in middle
+                const radius = 3 + Math.random() * 25;
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
                 const z = -Math.random() * 250;
@@ -583,18 +573,16 @@
                 starMesh.setMatrixAt(i, dummy.matrix);
             }
             scene.add(starMesh);
-            // ----------------------------------
 
             // Final Glowing Pitch
             let pitchMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
-            const pitchGeo = new THREE.PlaneGeometry(35, 8.75); // 4:1 aspect
+            const pitchGeo = new THREE.PlaneGeometry(35, 8.75);
             const pitchPlane = new THREE.Mesh(pitchGeo, pitchMat);
 
             if (CONFIG.finalPitchImage) {
                 textureLoader.load(CONFIG.finalPitchImage, (tex) => {
                     pitchMat.map = tex;
                     pitchMat.needsUpdate = true;
-                    // Dynamically scale final pitch image to prevent squeezing
                     const imgAspect = tex.image.width / tex.image.height;
                     pitchPlane.scale.y = (35 / imgAspect) / 8.75;
                 });
@@ -602,14 +590,13 @@
                 pitchMat.map = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
             }
             
-            const finalZPos = -140; // Adjusted based on new text pacing
+            const finalZPos = -140;
             pitchPlane.position.set(0, 0, finalZPos);
             scene.add(pitchPlane);
 
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
             scene.add(ambientLight);
 
-            // Key Light for the shelf
             const spotLight = new THREE.SpotLight(0xffffff, 2.5);
             spotLight.position.set(5, 10, 10);
             spotLight.angle = Math.PI / 4;
@@ -619,12 +606,10 @@
             spotLight.shadow.mapSize.height = 1024;
             scene.add(spotLight);
 
-            // Cinematic Rim Light (Now using #8ac53f brand color)
             const rimLight = new THREE.PointLight(0x8ac53f, 3, 40);
             rimLight.position.set(-8, -2, -5);
             scene.add(rimLight);
             
-            // Warm Fill Light
             const fillLight = new THREE.PointLight(0xffaa55, 1, 30);
             fillLight.position.set(8, 2, 5);
             scene.add(fillLight);
@@ -632,7 +617,6 @@
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
             
-            // DOM Elements
             const progressBar = document.getElementById('progress-bar');
             const scrollHint = document.getElementById('scroll-hint');
             const cdUI = document.getElementById('cassette-details');
@@ -643,7 +627,6 @@
                 mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
                 mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
                 
-                // Raycast for hover effects only when viewing shelf
                 if (scrollProgress >= 0.1 && scrollProgress < 0.3) {
                     raycaster.setFromCamera(mouse, camera);
                     const intersects = raycaster.intersectObjects(cassettes);
@@ -675,16 +658,13 @@
                 if (intersects.length > 0) {
                     const clicked = intersects[0].object;
                     
-                    // Toggle active state
                     if (clicked.userData.state === 'active') {
                         clicked.userData.state = 'idle';
                         cdUI.classList.remove('visible');
                     } else {
-                        // Deactivate others
                         cassettes.forEach(c => c.userData.state = 'idle');
                         clicked.userData.state = 'active';
                         
-                        // Show Cassette Info UI
                         cdTitle.innerText = clicked.userData.title;
                         cdActivities.innerText = clicked.userData.activities;
                         cdUI.classList.add('visible');
@@ -702,7 +682,6 @@
                 const maxScroll = document.body.scrollHeight - window.innerHeight;
                 targetScrollProgress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
                 
-                // Update UI elements
                 progressBar.style.height = `${targetScrollProgress * 100}%`;
                 if (targetScrollProgress > 0.02) {
                     scrollHint.style.opacity = '0';
@@ -723,30 +702,29 @@
 
             const clock = new THREE.Clock();
             let lastScrollProgress = 0;
-            let currentStarStretch = 1; // Track star stretch for smooth braking
+            let currentStarStretch = 1;
 
             function animate() {
                 requestAnimationFrame(animate);
                 const elapsedTime = clock.getElapsedTime();
 
-                // Smooth scroll interpolation
                 scrollProgress = lerp(scrollProgress, targetScrollProgress, 0.07);
                 const scrollDelta = Math.abs(scrollProgress - lastScrollProgress);
                 lastScrollProgress = scrollProgress;
 
-                // --- HEADER LOGO FADE LOGIC ---
-                const headerLogo = document.getElementById('header-logo');
-                if (headerLogo) {
-                    // Hide logo dynamically right as the letterbox starts expanding (0.01)
-                    // Bring it back exactly as the shelf comes fully into view (0.13)
-                    if (scrollProgress > 0.01 && scrollProgress < 0.13) {
-                        headerLogo.style.opacity = '0';
+                // --- HEADER FADE LOGIC ---
+                const header = document.querySelector('header');
+                if (header) {
+                    if (scrollProgress < 0.13) {
+                        header.style.opacity = '0';
+                        header.style.pointerEvents = 'none';
                     } else {
-                        headerLogo.style.opacity = '1';
+                        header.style.opacity = '1';
+                        header.style.pointerEvents = 'auto';
                     }
                 }
 
-                // --- UI Hint Logic ---
+                // --- CAMPAIGN HINT LOGIC ---
                 const campaignHint = document.getElementById('campaign-hint');
                 if (scrollProgress >= 0.14 && scrollProgress <= 0.26) {
                     campaignHint.style.opacity = '1';
@@ -754,8 +732,19 @@
                     campaignHint.style.opacity = '0';
                 }
 
-                // --- CAMERA LOGIC ---
-                let targetCamZ = 45; // Start position (at Logo)
+                // --- SINGLE STAGE TYPOGRAPHY TIMELINE (FASTER FADE) ---
+                const text1 = document.getElementById('intro-text-1');
+                
+                if (scrollProgress < 0.03) {
+                    // Text 1 starts visible, fades out very quickly towards 0.03
+                    const opacity1 = Math.max(0, 1 - (scrollProgress / 0.03));
+                    if (text1) text1.style.opacity = opacity1.toString();
+                } else {
+                    if (text1) text1.style.opacity = '0';
+                }
+
+                // --- CAMERA & PORTAL TRANSITION LOGIC ---
+                let targetCamZ = 45; 
                 let targetCamY = 0;
                 let targetCamX = 0;
                 
@@ -763,19 +752,18 @@
                 let targetTunnelScale = 1;
 
                 if (scrollProgress < 0.15) {
-                    // Phase 0: Start to Shelf View with smooth mathematical easing
                     const localProg = scrollProgress / 0.15;
-                    const camEase = 1 - Math.pow(1 - localProg, 3); // Cubic ease out for buttery smooth camera landing
+                    const camEase = 1 - Math.pow(1 - localProg, 3); 
 
-                    targetCamZ = 45 - (camEase * 33); // Moves from Z 45 to Z 12 smoothly
-
-                    // Expand the background vertically to engulf the screen
+                    targetCamZ = 45 - (camEase * 33); 
                     targetTunnelScale = 1 + (camEase * 40); 
 
-                    // Start fading the white into the black vignette much sooner for a cohesive blend
+                    const dotScale = 1 + Math.pow(localProg, 4) * 160;
+                    dotMesh.scale.set(dotScale, dotScale, 1);
+                    dotMesh.material.opacity = 1.0;
+
                     if (scrollProgress > 0.03) {
                         const fadeProg = Math.min(1, (scrollProgress - 0.03) / 0.12);
-                        // Using quadratic ease for a slow, gentle transition from white to black
                         const alphaEase = Math.pow(fadeProg, 2); 
                         targetTunnelOpacity = 1.0 - alphaEase;
                     } else {
@@ -783,28 +771,26 @@
                     }
                 } 
                 else if (scrollProgress >= 0.15 && scrollProgress < 0.3) {
-                    // Phase 1: Hold at Shelf
                     targetCamZ = 12;
                     targetTunnelOpacity = 0;
+                    dotMesh.scale.set(0.001, 0.001, 1);
+                    dotMesh.material.opacity = 0;
                 }
                 else if (scrollProgress >= 0.3 && scrollProgress < 0.75) {
-                    // Phase 2: Fly straight through the Void
                     const localProg = (scrollProgress - 0.3) / 0.45;
                     const easeProg = localProg < 0.5 ? 2 * localProg * localProg : 1 - Math.pow(-2 * localProg + 2, 2) / 2;
                     
-                    targetCamZ = 12 - (easeProg * 132); // Fly deep from 12 to -120
-                    targetCamY = 0; // Straight flight
+                    targetCamZ = 12 - (easeProg * 132); 
+                    targetCamY = 0; 
                     targetCamX = 0; 
                 } 
                 else if (scrollProgress >= 0.75 && scrollProgress < 0.85) {
-                    // Phase 3: Push into Final Pitch Text (Landed feeling)
                     const localProg = (scrollProgress - 0.75) / 0.10;
                     targetCamZ = -120 - (localProg * 6); 
                     targetCamY = 0; 
                     targetCamX = 0;
                 } 
                 else {
-                    // Phase 4: Hold completely still while HTML footer scrolls over
                     targetCamZ = -126;
                     targetCamY = 0;
                     targetCamX = 0;
@@ -814,15 +800,12 @@
                 camera.position.y = lerp(camera.position.y, targetCamY, 0.05);
                 camera.position.z = lerp(camera.position.z, targetCamZ, 0.05);
 
-                // Look steadily forward
                 camera.lookAt(0, 0, camera.position.z - 20);
 
-                // Apply intro letterbox scaling and fading
                 introBgPlane.scale.y = lerp(introBgPlane.scale.y, targetTunnelScale, 0.1);
                 introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, targetTunnelOpacity, 0.1);
 
-                // --- 2. SHELF FADE IN & CASSETTE PARTING LOGIC ---
-                // Fade in shelf materials smoothly after logo passes
+                // --- SHELF AND PRODUCT DISPERSION LOGIC ---
                 let targetShelfOpacity = (scrollProgress > 0.05) ? 1 : 0;
                 plasticMaterial.opacity = lerp(plasticMaterial.opacity, targetShelfOpacity, 0.05);
                 shelfMat.opacity = lerp(shelfMat.opacity, targetShelfOpacity, 0.05);
@@ -838,22 +821,21 @@
                     let targetRotY = ud.baseRotY;
 
                     if (scrollProgress >= 0.28) {
-                        // Parting the cassettes to fly through them
-                        const partProg = Math.min(1, (scrollProgress - 0.28) * 6); // Quick expansion factor
+                        const partProg = Math.min(1, (scrollProgress - 0.28) * 6); 
                         let dir = Math.sign(ud.baseX);
-                        if (dir === 0) dir = idx % 2 === 0 ? 1 : -1; // Push the center one arbitrarily
+                        if (dir === 0) dir = idx % 2 === 0 ? 1 : -1; 
                         
                         targetX = ud.baseX + (dir * partProg * 15);
-                        targetRotY = ud.baseRotY + (dir * partProg * Math.PI / 2); // Spin slightly as they fly away
+                        targetRotY = ud.baseRotY + (dir * partProg * Math.PI / 2); 
                         
                         ud.state = 'idle';
-                        cdUI.classList.remove('visible'); // Hide UI automatically
+                        cdUI.classList.remove('visible'); 
                     } else {
                         if (ud.state === 'active') {
                             targetZ = 3.5;
                             targetRotY = -Math.PI / 2;
                         } else if (ud.state === 'hover') {
-                            targetZ = 0.5; // Peek out
+                            targetZ = 0.5; 
                             targetRotY = 0;
                         }
                     }
@@ -863,17 +845,14 @@
                     cassette.rotation.y = lerp(cassette.rotation.y, targetRotY, 0.1);
                 });
                 
-                // Drop the shelf down and out of the way
                 let targetShelfY = scrollProgress >= 0.28 ? -10 : -2.2;
                 shelfMesh.position.y = lerp(shelfMesh.position.y, targetShelfY, 0.1);
 
-                // --- 3. FLOATING TEXT LOGIC ---
+                // --- FLOATING BRAND MESSAGES LOGIC ---
                 textPlanes.forEach((item, index) => {
-                    // Gentle floating
                     item.targetY = item.baseY + Math.sin(elapsedTime * 1.5 + index) * 0.8;
                     item.mesh.position.y = lerp(item.mesh.position.y, item.targetY, 0.1);
                     
-                    // Keep text completely hidden until we burst through the shelf
                     if (scrollProgress < 0.3) {
                         item.mesh.material.opacity = lerp(item.mesh.material.opacity, 0, 0.2);
                     } else {
@@ -886,48 +865,43 @@
                     }
                 });
 
-                // --- 3.5 HYPERSPACE LOGIC ---
-                // Warp effect stops the precise moment the final pitch text becomes visible
+                // --- DEEP WARP HYPERSPACE SPEED LOGIC ---
                 let isWarping = scrollProgress >= 0.28 && scrollProgress < 0.65;
                 let isDeepSpace = scrollProgress >= 0.28;
                 
-                // Keep stars visible after landing, just slightly dimmer
                 let targetStarOpacity = 0;
                 if (isWarping) {
                     targetStarOpacity = 0.6;
                 } else if (isDeepSpace) {
-                    targetStarOpacity = 0.3; // Dimmer stars after dropping out of warp
+                    targetStarOpacity = 0.3; 
                 }
 
                 starMat.opacity = lerp(starMat.opacity, targetStarOpacity, 0.05);
                 
-                // Speed increases dramatically based on how fast the user scrolls, but ONLY when warping
-                let baseWarpSpeed = isWarping ? 0.3 : 0.005; // Drop to very slow drift when not warping
+                let baseWarpSpeed = isWarping ? 0.3 : 0.005; 
                 let activeWarpSpeed = baseWarpSpeed + (isWarping ? (scrollDelta * 50) : 0);
 
-                // Smoothly stretch and un-stretch the stars
                 let targetZScale = isWarping ? (1 + activeWarpSpeed * 40) : 1;
                 currentStarStretch = lerp(currentStarStretch, targetZScale, 0.1);
 
                 if (starMat.opacity > 0.01) {
                     for(let i=0; i<starCount; i++) {
                         let data = starData[i];
-                        // Slow down the forward movement significantly when not warping
                         data.z += (data.speed * (isWarping ? 1 : 0.2)) + activeWarpSpeed; 
                         
                         if (data.z > camera.position.z) {
-                            data.z = camera.position.z - 250; // Loop back to far end
+                            data.z = camera.position.z - 250; 
                         }
                         
                         dummy.position.set(data.x, data.y, data.z);
-                        dummy.scale.set(1, 1, currentStarStretch); // Apply stretched or dot scale
+                        dummy.scale.set(1, 1, currentStarStretch); 
                         dummy.updateMatrix();
                         starMesh.setMatrixAt(i, dummy.matrix);
                     }
                     starMesh.instanceMatrix.needsUpdate = true;
                 }
 
-                // --- 4. FINAL PITCH LOGIC ---
+                // --- FINAL GLOW LOGIC ---
                 const distToFinal = pitchPlane.position.z - camera.position.z;
                 if (Math.abs(distToFinal) < 60) {
                     const glowPulse = 0.7 + Math.sin(elapsedTime * 2) * 0.3;
