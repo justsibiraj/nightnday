@@ -210,30 +210,34 @@
     <!-- Scrollable Area -->
     <div class="scroll-container"></div>
 
-    <!-- Static UI Layer -->
+   <!-- Static UI Layer -->
 <div class="ui-layer">
-    <!-- Added 'relative' here to anchor the logo -->
-    <header class="relative grid grid-cols-3 items-center w-full pointer-events-auto">
-        <!-- Left Menu -->
-        <div class="justify-self-start flex gap-8">
-            <a href="#projects" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
-                Projects
-            </a>
-            <a href="#services" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">
-                Services
-            </a>
-        </div>
+    <!-- Header: Uses flex to keep links centered around the logo -->
+    <header class="relative flex justify-center items-center w-full pointer-events-auto px-4 py-6">
         
-        <!-- Logo: Changed to 'absolute' to break it out of the grid flow -->
-        <div class="absolute left-1/2 -translate-x-1/2">
+        <!-- Logo: Absolutely positioned to calculate dead center without altering edge text -->
+        <div class="absolute left-1/2 -translate-x-1/2 flex justify-center items-center z-20">
             <img id="header-logo" src="ndw logo 00.png" alt="NIGHT & DAY" class="h-24 object-contain transition-opacity duration-700" onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[0.9rem] tracking-[0.2em] font-serif uppercase text-white transition-opacity duration-700';">
         </div>
 
-        <!-- Right Menu -->
-        <div class="justify-self-end flex gap-8">
-            <a href="#team" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">Team</a>
-            <a href="#about" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">About Us</a>
-        </div>
+        <!-- Navigation links anchored to the logo position -->
+        <nav class="flex items-center gap-16 mt-24 z-10">
+            <!-- Left Menu -->
+            <div class="flex gap-8">
+                <a href="#projects" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
+                    Projects
+                </a>
+                <a href="#services" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">
+                    Services
+                </a>
+            </div>
+            
+            <!-- Right Menu -->
+            <div class="flex gap-8">
+                <a href="#team" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">Team</a>
+                <a href="#about" class="text-xs tracking-widest text-white uppercase hover:text-[#8ac53f] transition-colors">About Us</a>
+            </div>
+        </nav>
     </header>
     
     <div class="scroll-indicator" id="scroll-hint">
