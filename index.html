@@ -3,131 +3,861 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>.work | Marketing Films & Creative Production</title>
+    <title>Night & Day | Cinematic Canvas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --accent-green: #9dfc5d; /* Matching your logo outline */
-            --text-color: #ffffff;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap');
 
+        :root {
+            --bg-color: #030303;
+        }
+        
         body, html {
             margin: 0;
             padding: 0;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        /* Cinematic Vignette Overlay */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            display: block;
+        }
+
+        .scroll-container {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            height: 600vh; /* Extended slightly for smoother pacing */
+            pointer-events: none; 
+        }
+
+        .ui-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            z-index: 4;
+            pointer-events: none;
             display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+
+        .title-brand {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .scroll-indicator {
+            align-self: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.8;
+            transition: opacity 0.5s ease;
+        }
+
+        .mouse-icon {
+            width: 24px;
+            height: 36px;
+            border: 2px solid white;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .mouse-wheel {
+            width: 4px;
+            height: 8px;
+            background: white;
+            border-radius: 2px;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollWheel 1.5s infinite;
+        }
+
+        @keyframes scrollWheel {
+            0% { transform: translate(-50%, 0); opacity: 1; }
+            100% { transform: translate(-50%, 12px); opacity: 0; }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 40vh;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 4;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background: white;
+            height: 0%;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transition: height 0.1s ease-out;
+        }
+
+        /* Cassette Details UI */
+        #cassette-details {
+            position: fixed;
+            bottom: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem 4rem;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom: none;
+            text-align: center;
+            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+
+        #cassette-details.visible {
+            bottom: 0;
+        }
+
+        /* Footer Section */
+        .footer-section {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, transparent, #030303 30%);
+            pointer-events: auto;
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            transition: opacity 1s ease, visibility 1s;
         }
 
-        /* Subtle cinematic background glow */
-        .gradient-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-            z-index: -1;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
         }
 
-        .container {
-            text-align: center;
-            padding: 20px;
-            max-width: 800px;
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        .logo {
-            width: 180px;
-            margin-bottom: 40px;
-            transition: transform 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 800;
-            letter-spacing: -2px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: #888;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        .tag {
-            border: 1px solid #333;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-green);
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 15px 35px;
-            background-color: var(--accent-green);
-            color: #000;
-            text-decoration: none;
-            font-weight: 700;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .cta-button:hover {
-            box-shadow: 0 0 20px rgba(157, 252, 93, 0.4);
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-white selection:text-black">
 
-    <div class="gradient-bg"></div>
-
-    <div class="container">
-        <img src="ndw v2.png" alt=".work Logo" class="logo">
-        
-        <h1>Creative Engine Room.</h1>
-        
-        <p>Crafting high-impact marketing films and end-to-end video production pipelines for the world's most ambitious creatives.</p>
-
-        <div class="tag-container">
-            <div class="tag">Marketing Films</div>
-            <div class="tag">Creative Campaigns</div>
-            <div class="tag">Full-Scale Production</div>
-        </div>
-
-        <a href="mailto:hello@yourdomain.work" class="cta-button">Start a Project</a>
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <h1 class="text-sm tracking-[0.3em] font-light text-gray-300">INITIALIZING SCENE</h1>
     </div>
 
+    <div class="vignette"></div>
+
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Scrollable Area -->
+    <div class="scroll-container"></div>
+
+    <!-- Static UI Layer -->
+    <div class="ui-layer">
+        <header class="flex justify-between items-center w-full pointer-events-auto">
+            <a href="#projects" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
+                Projects
+            </a>
+            <div class="flex gap-8">
+                <a href="#about" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors">About Us</a>
+                <a href="#team" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors">Team</a>
+                <a href="#services" class="text-xs tracking-widest text-white uppercase hover:text-gray-400 transition-colors">Services</a>
+            </div>
+        </header>
+        
+        <div class="scroll-indicator" id="scroll-hint">
+            <div class="mouse-icon"><div class="mouse-wheel"></div></div>
+            <span class="text-[0.65rem] tracking-[0.3em] uppercase">Scroll to explore</span>
+        </div>
+
+        <!-- Campaign Hint -->
+        <div id="campaign-hint" class="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 text-[0.65rem] tracking-[0.2em] text-gray-300 uppercase opacity-0 transition-opacity duration-700 pointer-events-none text-center drop-shadow-md w-full">
+            Click for campaign details
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Dynamic Cassette Details -->
+    <div id="cassette-details">
+        <h3 id="cd-title" class="font-serif text-2xl tracking-[0.15em] text-white mb-3 uppercase">Title</h3>
+        <p id="cd-activities" class="text-sm tracking-wider text-gray-400 font-light"></p>
+    </div>
+
+    <!-- Final Footer Section -->
+    <div class="footer-section">
+        <button class="px-10 py-5 bg-white text-black font-bold tracking-[0.2em] text-sm uppercase rounded-full hover:scale-105 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+            Connect With Us
+        </button>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Remove loader gracefully
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.visibility = 'hidden', 1000);
+            }, 800);
+
+            // Three.js Core Setup
+            const canvas = document.getElementById('webgl-canvas');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x030303, 0.012); // Slightly deeper fog
+
+            // --- CENTRAL CONFIGURATION ---
+            // Customize text, final copy, and fonts here
+            const CONFIG = {
+                introLogoText: "NIGHT & DAY",
+                introLogoImage: ndw logo 00.png, // e.g., 'path/to/logo.png' (replaces intro text if set)
+                finalPitchText: "FILM POSITIONING",
+                finalPitchImage: null, // e.g., 'path/to/pitch.png' (replaces final text if set)
+                fontPrimary: '"Inter", sans-serif',
+                fontSecondary: '"Cinzel", serif'
+            };
+            // -----------------------------
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+
+            // Advanced dynamic texture generator
+            function createTextTexture(title, width, height, bgColor, textColor, isSpine = false, isGlow = false) {
+                const ctxCanvas = document.createElement('canvas');
+                ctxCanvas.width = width;
+                ctxCanvas.height = height;
+                const ctx = ctxCanvas.getContext('2d');
+
+                // Background fill
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, width, height);
+
+                // Add grain/noise for realism if not transparent
+                if (bgColor !== 'transparent') {
+                    for(let i=0; i< (width*height)*0.05; i++) {
+                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
+                        ctx.fillRect(Math.random()*width, Math.random()*height, 2, 2);
+                    }
+                }
+
+                ctx.fillStyle = textColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                if (isGlow) {
+                    ctx.shadowColor = textColor;
+                    ctx.shadowBlur = 50;
+                    ctx.font = `bold 100px ${CONFIG.fontSecondary}`;
+                } else {
+                    ctx.font = isSpine ? `bold 36px ${CONFIG.fontPrimary}` : `900 80px ${CONFIG.fontPrimary}`;
+                }
+
+                if (isSpine) {
+                    // Draw Spine
+                    ctx.save();
+                    ctx.translate(width / 2, height / 2);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.fillText(title, 0, 0);
+                    ctx.restore();
+                    
+                    // Spine details (Studio logo placeholder)
+                    ctx.font = '14px Arial';
+                    ctx.fillText('N&D', width / 2, height - 30);
+                    // Spine visual line
+                    ctx.fillStyle = textColor;
+                    ctx.fillRect(width/2 - 20, 30, 40, 2);
+                } else {
+                    // Draw Cover
+                    if (!isGlow && bgColor !== 'transparent') {
+                        // Poster Border
+                        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(20, 20, width - 40, height - 40);
+
+                        // Main Title
+                        ctx.fillText(title, width / 2, height / 2 - 40);
+                        
+                        // Faux Credits
+                        ctx.font = '300 16px "Inter", sans-serif';
+                        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        ctx.fillText('A NIGHT & DAY STUDIOS PRODUCTION', width / 2, height / 2 + 60);
+                        
+                        // Faux Barcode & Rating
+                        ctx.fillStyle = '#fff';
+                        for(let i=0; i<15; i++) {
+                            let w = Math.random() * 6 + 1;
+                            ctx.fillRect(40 + (i * 10), height - 70, w, 30);
+                        }
+                        ctx.font = 'bold 20px Arial';
+                        ctx.fillText('R', width - 60, height - 55);
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(width - 75, height - 72, 30, 30);
+                    } else {
+                        // Just text (for services or final glow)
+                        ctx.fillText(title, width / 2, height / 2);
+                    }
+                }
+
+                const texture = new THREE.CanvasTexture(ctxCanvas);
+                texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                return texture;
+            }
+
+            const textureLoader = new THREE.TextureLoader();
+
+            const shelfGroup = new THREE.Group();
+            scene.add(shelfGroup);
+
+            // You can now customize images by passing URL strings to coverImage / spineImage 
+            // e.g., coverImage: 'path/to/dune-cover.jpg'
+            const films = [
+                { 
+                    title: 'DRAGON', color: '#8c593b', 
+                    coverImage: null, spineImage: null,
+                    activities: "Global Strategy • Audience Building • Trailer Positioning" 
+                },
+                { 
+                    title: 'LEO', color: '#1a1a1a', 
+                    coverImage: null, spineImage: null,
+                    activities: "Digital Campaigns • IMAX Partnerships • Cultural Relevance" 
+                },
+                { 
+                    title: 'YOUTH', color: '#2a3b2c', 
+                    coverImage: null, spineImage: null,
+                    activities: "Word of Mouth • Press Narrative • Oscar Campaign Strategy" 
+                },
+                { 
+                    title: 'RETRO', color: '#0d1321', 
+                    coverImage: null, spineImage: null,
+                    activities: "Brand Partnerships • Data Analytics • Influencer Network" 
+                },
+                { 
+                    title: 'GOAT', color: '#4a0e0e', 
+                    coverImage: null, spineImage: null,
+                    activities: "Creative Direction • Meme Marketing • Global Scale Rollout" 
+                }
+            ];
+
+            const cassettes = [];
+            const cassetteWidth = 0.7;
+            const cassetteHeight = 4.2;
+            const cassetteDepth = 2.8;
+            const spacing = 1.0;
+            const startX = -((films.length - 1) * spacing) / 2;
+
+            // Cassette shell material (dark, slightly reflective plastic)
+            const plasticMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x0a0a0a, 
+                roughness: 0.8, 
+                metalness: 0.3,
+                transparent: true,
+                opacity: 0
+            });
+
+            films.forEach((film, index) => {
+                const geometry = new THREE.BoxGeometry(cassetteWidth, cassetteHeight, cassetteDepth);
+                
+                let spineTexture, coverTexture;
+
+                // Load custom images if provided in config, otherwise generate text canvas
+                if (film.spineImage) {
+                    spineTexture = textureLoader.load(film.spineImage);
+                } else {
+                    spineTexture = createTextTexture(film.title, 128, 512, '#111', '#ffffff', true);
+                }
+
+                if (film.coverImage) {
+                    coverTexture = textureLoader.load(film.coverImage);
+                } else {
+                    coverTexture = createTextTexture(film.title, 512, 768, film.color, '#ffffff', false);
+                }
+
+                const spineMaterial = new THREE.MeshStandardMaterial({ map: spineTexture, roughness: 0.4, transparent: true, opacity: 0 });
+                const coverMaterial = new THREE.MeshStandardMaterial({ map: coverTexture, roughness: 0.3, transparent: true, opacity: 0 });
+
+                // Box faces: Right, Left, Top, Bottom, Front(Spine), Back
+                const materials = [ coverMaterial, plasticMaterial, plasticMaterial, plasticMaterial, spineMaterial, plasticMaterial ];
+
+                const cassette = new THREE.Mesh(geometry, materials);
+                cassette.castShadow = true;
+                cassette.receiveShadow = true;
+
+                const xPos = startX + (index * spacing);
+                cassette.position.set(xPos, 0, 0);
+                
+                // Store state for animations
+                cassette.userData = {
+                    baseX: xPos, baseY: 0, baseZ: 0, baseRotY: 0,
+                    targetZ: 0, targetRotY: 0,
+                    state: 'idle', // idle, hover, active
+                    title: film.title,
+                    activities: film.activities
+                };
+
+                shelfGroup.add(cassette);
+                cassettes.push(cassette);
+            });
+
+            // Add a subtle shelf base
+            const shelfGeo = new THREE.BoxGeometry(10, 0.2, 4);
+            const shelfMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.9, transparent: true, opacity: 0 });
+            const shelfMesh = new THREE.Mesh(shelfGeo, shelfMat);
+            shelfMesh.position.set(0, -2.2, 0);
+            shelfMesh.receiveShadow = true;
+            shelfGroup.add(shelfMesh);
+
+            // Intro Logo Plane
+            let logoMat;
+            if (CONFIG.introLogoImage) {
+                const tex = textureLoader.load(CONFIG.introLogoImage);
+                logoMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending });
+            } else {
+                const tex = createTextTexture(CONFIG.introLogoText, 2048, 512, 'transparent', '#ffffff', false, true);
+                logoMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending });
+            }
+            const logoGeo = new THREE.PlaneGeometry(30, 7.5);
+            const logoPlane = new THREE.Mesh(logoGeo, logoMat);
+            logoPlane.position.set(0, 0, 30); // Start way in front of the shelf
+            scene.add(logoPlane);
+
+            const services = [
+                { text: "Strategy & Positioning", image: null }, 
+                { text: "Digital Campaigns", image: null }, 
+                { text: "Cultural Relevance", image: null }, 
+                { text: "Audience Building", image: null }, 
+                { text: "Data Analytics", image: null }, 
+                { text: "Creative Direction", image: null }, 
+                { text: "Influencer Network", image: null }, 
+                { text: "Brand Partnerships", image: null }, 
+                { text: "Global Scale", image: null }
+            ];
+
+            const textPlanes = [];
+            services.forEach((service, i) => {
+                let mat;
+                if (service.image) {
+                    const tex = textureLoader.load(service.image);
+                    mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 });
+                } else {
+                    const tex = createTextTexture(service.text, 1024, 256, 'transparent', 'rgba(255,255,255,0.8)', false);
+                    mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 });
+                }
+                const geo = new THREE.PlaneGeometry(16, 4);
+                const plane = new THREE.Mesh(geo, mat);
+                
+                // Spiral distribution keeping the center tunnel clear
+                const zPos = -15 - (i * 12); // Paced to appear much sooner after the shelf
+                const angle = i * Math.PI * 0.7;
+                const radius = 6 + Math.random() * 6; // Push text outward so we don't clip right through it
+                const xPos = Math.cos(angle) * radius;
+                const yPos = Math.sin(angle) * radius * 0.6;
+                
+                plane.position.set(xPos, yPos, zPos);
+                // Make them face the camera generally
+                plane.lookAt(0, 0, zPos + 10);
+                
+                scene.add(plane);
+                textPlanes.push({ mesh: plane, baseY: yPos, targetY: yPos });
+            });
+
+            // --- HYPERSPACE STARFIELD SETUP ---
+            const starCount = 600;
+            const starGeo = new THREE.BoxGeometry(0.05, 0.05, 2);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+            const starMesh = new THREE.InstancedMesh(starGeo, starMat, starCount);
+            
+            const dummy = new THREE.Object3D();
+            const starData = [];
+            for(let i=0; i<starCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 3 + Math.random() * 25; // Tunnel hole in middle
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                const z = -Math.random() * 250;
+                const speed = 0.5 + Math.random() * 1.0;
+                starData.push({x, y, z, speed});
+                
+                dummy.position.set(x, y, z);
+                dummy.updateMatrix();
+                starMesh.setMatrixAt(i, dummy.matrix);
+            }
+            scene.add(starMesh);
+            // ----------------------------------
+
+            // Final Glowing Pitch
+            let pitchMat;
+            if (CONFIG.finalPitchImage) {
+                const tex = textureLoader.load(CONFIG.finalPitchImage);
+                pitchMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
+            } else {
+                const pitchTex = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
+                pitchMat = new THREE.MeshBasicMaterial({ map: pitchTex, transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
+            }
+            const pitchGeo = new THREE.PlaneGeometry(35, 8.75); // 4:1 aspect
+            const pitchPlane = new THREE.Mesh(pitchGeo, pitchMat);
+            const finalZPos = -140; // Adjusted based on new text pacing
+            pitchPlane.position.set(0, 0, finalZPos);
+            scene.add(pitchPlane);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+            scene.add(ambientLight);
+
+            // Key Light for the shelf
+            const spotLight = new THREE.SpotLight(0xffffff, 2.5);
+            spotLight.position.set(5, 10, 10);
+            spotLight.angle = Math.PI / 4;
+            spotLight.penumbra = 0.8;
+            spotLight.castShadow = true;
+            spotLight.shadow.mapSize.width = 1024;
+            spotLight.shadow.mapSize.height = 1024;
+            scene.add(spotLight);
+
+            // Cinematic Rim Light (Blueish)
+            const rimLight = new THREE.PointLight(0x4477ff, 3, 40);
+            rimLight.position.set(-8, -2, -5);
+            scene.add(rimLight);
+            
+            // Warm Fill Light
+            const fillLight = new THREE.PointLight(0xffaa55, 1, 30);
+            fillLight.position.set(8, 2, 5);
+            scene.add(fillLight);
+
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            
+            // DOM Elements
+            const progressBar = document.getElementById('progress-bar');
+            const scrollHint = document.getElementById('scroll-hint');
+            const cdUI = document.getElementById('cassette-details');
+            const cdTitle = document.getElementById('cd-title');
+            const cdActivities = document.getElementById('cd-activities');
+
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                // Raycast for hover effects only when viewing shelf
+                if (scrollProgress >= 0.1 && scrollProgress < 0.3) {
+                    raycaster.setFromCamera(mouse, camera);
+                    const intersects = raycaster.intersectObjects(cassettes);
+                    
+                    cassettes.forEach(c => {
+                        if (c.userData.state === 'hover') c.userData.state = 'idle';
+                    });
+
+                    if (intersects.length > 0) {
+                        document.body.style.cursor = 'pointer';
+                        const hovered = intersects[0].object;
+                        if (hovered.userData.state !== 'active') {
+                            hovered.userData.state = 'hover';
+                        }
+                    } else {
+                        document.body.style.cursor = 'default';
+                    }
+                } else {
+                    document.body.style.cursor = 'default';
+                }
+            });
+
+            window.addEventListener('click', () => {
+                if (scrollProgress < 0.1 || scrollProgress > 0.3) return;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(cassettes);
+
+                if (intersects.length > 0) {
+                    const clicked = intersects[0].object;
+                    
+                    // Toggle active state
+                    if (clicked.userData.state === 'active') {
+                        clicked.userData.state = 'idle';
+                        cdUI.classList.remove('visible');
+                    } else {
+                        // Deactivate others
+                        cassettes.forEach(c => c.userData.state = 'idle');
+                        clicked.userData.state = 'active';
+                        
+                        // Show Cassette Info UI
+                        cdTitle.innerText = clicked.userData.title;
+                        cdActivities.innerText = clicked.userData.activities;
+                        cdUI.classList.add('visible');
+                    }
+                } else {
+                    cassettes.forEach(c => c.userData.state = 'idle');
+                    cdUI.classList.remove('visible');
+                }
+            });
+
+            let scrollProgress = 0;
+            let targetScrollProgress = 0;
+
+            window.addEventListener('scroll', () => {
+                const maxScroll = document.body.scrollHeight - window.innerHeight;
+                targetScrollProgress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+                
+                // Update UI elements
+                progressBar.style.height = `${targetScrollProgress * 100}%`;
+                if (targetScrollProgress > 0.02) {
+                    scrollHint.style.opacity = '0';
+                } else {
+                    scrollHint.style.opacity = '0.8';
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            function lerp(start, end, factor) {
+                return start + (end - start) * factor;
+            }
+
+            const clock = new THREE.Clock();
+            let lastScrollProgress = 0;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const elapsedTime = clock.getElapsedTime();
+
+                // Smooth scroll interpolation
+                scrollProgress = lerp(scrollProgress, targetScrollProgress, 0.07);
+                const scrollDelta = Math.abs(scrollProgress - lastScrollProgress);
+                lastScrollProgress = scrollProgress;
+
+                // --- UI Hint Logic ---
+                const campaignHint = document.getElementById('campaign-hint');
+                if (scrollProgress >= 0.14 && scrollProgress <= 0.26) {
+                    campaignHint.style.opacity = '1';
+                } else {
+                    campaignHint.style.opacity = '0';
+                }
+
+                // --- 1. CAMERA LOGIC ---
+                let targetCamZ = 45; // Start position (at Logo)
+                let targetCamY = 0;
+                let targetCamX = 0;
+                
+                if (scrollProgress < 0.15) {
+                    // Phase 0: Logo to Shelf View
+                    targetCamZ = 45 - ((scrollProgress / 0.15) * 33); // Moves from Z 45 to Z 12
+                    logoPlane.material.opacity = lerp(logoPlane.material.opacity, 1 - (scrollProgress * 10), 0.1);
+                } 
+                else if (scrollProgress >= 0.15 && scrollProgress < 0.3) {
+                    // Phase 1: Hold at Shelf
+                    targetCamZ = 12;
+                    logoPlane.material.opacity = lerp(logoPlane.material.opacity, 0, 0.1);
+                }
+                else if (scrollProgress >= 0.3 && scrollProgress < 0.75) {
+                    // Phase 2: Fly straight through the Void
+                    const localProg = (scrollProgress - 0.3) / 0.45;
+                    const easeProg = localProg < 0.5 ? 2 * localProg * localProg : 1 - Math.pow(-2 * localProg + 2, 2) / 2;
+                    
+                    targetCamZ = 12 - (easeProg * 132); // Fly deep from 12 to -120
+                    targetCamY = 0; // Straight flight
+                    targetCamX = 0; 
+                    logoPlane.material.opacity = 0;
+                } 
+                else if (scrollProgress >= 0.75 && scrollProgress < 0.85) {
+                    // Phase 3: Push into Final Pitch Text (Landed feeling)
+                    const localProg = (scrollProgress - 0.75) / 0.10;
+                    targetCamZ = -120 - (localProg * 6); 
+                    targetCamY = 0; 
+                    targetCamX = 0;
+                } 
+                else {
+                    // Phase 4: Hold completely still while HTML footer scrolls over
+                    targetCamZ = -126;
+                    targetCamY = 0;
+                    targetCamX = 0;
+                }
+
+                camera.position.x = lerp(camera.position.x, targetCamX, 0.05);
+                camera.position.y = lerp(camera.position.y, targetCamY, 0.05);
+                camera.position.z = lerp(camera.position.z, targetCamZ, 0.05);
+
+                // Look steadily forward
+                camera.lookAt(0, 0, camera.position.z - 20);
+
+                // --- 2. SHELF FADE IN & CASSETTE PARTING LOGIC ---
+                // Fade in shelf materials smoothly after logo passes
+                let targetShelfOpacity = (scrollProgress > 0.05) ? 1 : 0;
+                plasticMaterial.opacity = lerp(plasticMaterial.opacity, targetShelfOpacity, 0.05);
+                shelfMat.opacity = lerp(shelfMat.opacity, targetShelfOpacity, 0.05);
+                cassettes.forEach(c => {
+                    if(c.material[0]) c.material[0].opacity = plasticMaterial.opacity;
+                    if(c.material[4]) c.material[4].opacity = plasticMaterial.opacity;
+                });
+
+                cassettes.forEach((cassette, idx) => {
+                    const ud = cassette.userData;
+                    let targetX = ud.baseX;
+                    let targetZ = ud.baseZ;
+                    let targetRotY = ud.baseRotY;
+
+                    if (scrollProgress >= 0.28) {
+                        // Parting the cassettes to fly through them
+                        const partProg = Math.min(1, (scrollProgress - 0.28) * 6); // Quick expansion factor
+                        let dir = Math.sign(ud.baseX);
+                        if (dir === 0) dir = idx % 2 === 0 ? 1 : -1; // Push the center one arbitrarily
+                        
+                        targetX = ud.baseX + (dir * partProg * 15);
+                        targetRotY = ud.baseRotY + (dir * partProg * Math.PI / 2); // Spin slightly as they fly away
+                        
+                        ud.state = 'idle';
+                        cdUI.classList.remove('visible'); // Hide UI automatically
+                    } else {
+                        if (ud.state === 'active') {
+                            targetZ = 3.5;
+                            targetRotY = -Math.PI / 2;
+                        } else if (ud.state === 'hover') {
+                            targetZ = 0.5; // Peek out
+                            targetRotY = 0;
+                        }
+                    }
+
+                    cassette.position.x = lerp(cassette.position.x, targetX, 0.1);
+                    cassette.position.z = lerp(cassette.position.z, targetZ, 0.1);
+                    cassette.rotation.y = lerp(cassette.rotation.y, targetRotY, 0.1);
+                });
+                
+                // Drop the shelf down and out of the way
+                let targetShelfY = scrollProgress >= 0.28 ? -10 : -2.2;
+                shelfMesh.position.y = lerp(shelfMesh.position.y, targetShelfY, 0.1);
+
+                // --- 3. FLOATING TEXT LOGIC ---
+                textPlanes.forEach((item, index) => {
+                    // Gentle floating
+                    item.targetY = item.baseY + Math.sin(elapsedTime * 1.5 + index) * 0.8;
+                    item.mesh.position.y = lerp(item.mesh.position.y, item.targetY, 0.1);
+                    
+                    // Keep text completely hidden until we burst through the shelf
+                    if (scrollProgress < 0.3) {
+                        item.mesh.material.opacity = lerp(item.mesh.material.opacity, 0, 0.2);
+                    } else {
+                        const dist = item.mesh.position.z - camera.position.z;
+                        if (dist > 2 || dist < -35) {
+                            item.mesh.material.opacity = lerp(item.mesh.material.opacity, 0, 0.1);
+                        } else {
+                            item.mesh.material.opacity = lerp(item.mesh.material.opacity, 1, 0.05);
+                        }
+                    }
+                });
+
+                // --- 3.5 HYPERSPACE LOGIC ---
+                // Warp effect stops before we hit the final pitch text to give a sense of landing
+                let isWarping = scrollProgress >= 0.28 && scrollProgress < 0.75;
+                starMat.opacity = lerp(starMat.opacity, isWarping ? 0.6 : 0, 0.05);
+                
+                // Speed increases dramatically based on how fast the user scrolls
+                let baseWarpSpeed = isWarping ? 0.3 : 0.02;
+                let activeWarpSpeed = baseWarpSpeed + (scrollDelta * 50);
+
+                if (starMat.opacity > 0.01) {
+                    for(let i=0; i<starCount; i++) {
+                        let data = starData[i];
+                        data.z += data.speed + activeWarpSpeed; // Move towards camera
+                        
+                        if (data.z > camera.position.z) {
+                            data.z = camera.position.z - 250; // Loop back to far end
+                        }
+                        
+                        dummy.position.set(data.x, data.y, data.z);
+                        dummy.scale.set(1, 1, 1 + activeWarpSpeed * 40); // Stretch based on current speed
+                        dummy.updateMatrix();
+                        starMesh.setMatrixAt(i, dummy.matrix);
+                    }
+                    starMesh.instanceMatrix.needsUpdate = true;
+                }
+
+                // --- 4. FINAL PITCH LOGIC ---
+                const distToFinal = pitchPlane.position.z - camera.position.z;
+                if (Math.abs(distToFinal) < 60) {
+                    const glowPulse = 0.7 + Math.sin(elapsedTime * 2) * 0.3;
+                    pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, glowPulse, 0.05);
+                    
+                    if (scrollProgress > 0.75) {
+                        const scale = 1 + ((scrollProgress - 0.75) * 0.4);
+                        pitchPlane.scale.set(scale, scale, scale);
+                    }
+                } else {
+                    pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, 0, 0.1);
+                }
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        };
+    </script>
 </body>
 </html>
