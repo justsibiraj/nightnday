@@ -477,7 +477,7 @@
             // Cinematic Intro Background (The accidental "Flash/Letterbox" effect)
             const introBgGeo = new THREE.PlaneGeometry(120, 25);
             // Soft white/silver color that interacts beautifully with the dark fog and CSS vignette
-            const introBgMat = new THREE.MeshBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.8 }); 
+            const introBgMat = new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true, opacity: 0 }); 
             const introBgPlane = new THREE.Mesh(introBgGeo, introBgMat);
             introBgPlane.position.set(0, 0, 29); // Positioned exactly 1 unit behind the logo
             scene.add(introBgPlane);
@@ -735,9 +735,12 @@
                     targetCamZ = 45 - ((scrollProgress / 0.15) * 33); // Moves from Z 45 to Z 12
                     logoPlane.material.opacity = lerp(logoPlane.material.opacity, 1 - (scrollProgress * 10), 0.1);
                     
-                    // Expand the cinematic background vertically and fade it out to black
+                    // Only fade in the tunnel glow once scrolling starts
+                    const targetTunnelOpacity = (scrollProgress > 0.02) ? 0.6 : 0;
+                    introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, targetTunnelOpacity, 0.1);
+                    
+                    // Expand the cinematic background vertically
                     introBgPlane.scale.y = lerp(introBgPlane.scale.y, 1 + (scrollProgress * 15), 0.1);
-                    introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, 0.8 - (scrollProgress * 8), 0.1);
                 } 
                 else if (scrollProgress >= 0.15 && scrollProgress < 0.3) {
                     // Phase 1: Hold at Shelf
