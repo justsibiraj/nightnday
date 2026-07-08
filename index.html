@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NightnDay | Film Positioning </title>
+    <title>Night & Day | Film Positioning</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -380,27 +380,27 @@
             // e.g., coverImage: 'path/to/dune-cover.jpg'
             const films = [
                 { 
-                    title: 'DRAGON', color: '#8c593b', 
+                    title: 'DUNE', color: '#8c593b', 
                     coverImage: null, spineImage: null,
                     activities: "Global Strategy • Audience Building • Trailer Positioning" 
                 },
                 { 
-                    title: 'LEO', color: '#1a1a1a', 
+                    title: 'OPPENHEIMER', color: '#1a1a1a', 
                     coverImage: null, spineImage: null,
                     activities: "Digital Campaigns • IMAX Partnerships • Cultural Relevance" 
                 },
                 { 
-                    title: 'YOUTH', color: '#2a3b2c', 
+                    title: 'PARASITE', color: '#2a3b2c', 
                     coverImage: null, spineImage: null,
                     activities: "Word of Mouth • Press Narrative • Oscar Campaign Strategy" 
                 },
                 { 
-                    title: 'RETRO', color: '#0d1321', 
+                    title: 'INTERSTELLAR', color: '#0d1321', 
                     coverImage: null, spineImage: null,
                     activities: "Brand Partnerships • Data Analytics • Influencer Network" 
                 },
                 { 
-                    title: 'GOAT', color: '#4a0e0e', 
+                    title: 'THE BATMAN', color: '#4a0e0e', 
                     coverImage: null, spineImage: null,
                     activities: "Creative Direction • Meme Marketing • Global Scale Rollout" 
                 }
@@ -475,16 +475,21 @@
             shelfGroup.add(shelfMesh);
 
             // Intro Logo Plane
-            let logoMat;
-            if (CONFIG.introLogoImage) {
-                const tex = textureLoader.load(CONFIG.introLogoImage);
-                logoMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending });
-            } else {
-                const tex = createTextTexture(CONFIG.introLogoText, 2048, 512, 'transparent', '#ffffff', false, true);
-                logoMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending });
-            }
+            let logoMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, opacity: 1 });
             const logoGeo = new THREE.PlaneGeometry(30, 7.5);
             const logoPlane = new THREE.Mesh(logoGeo, logoMat);
+            
+            if (CONFIG.introLogoImage) {
+                textureLoader.load(CONFIG.introLogoImage, (tex) => {
+                    logoMat.map = tex;
+                    logoMat.needsUpdate = true;
+                    // Dynamically scale Y axis to prevent squeezing based on original image aspect ratio
+                    const imgAspect = tex.image.width / tex.image.height;
+                    logoPlane.scale.y = (30 / imgAspect) / 7.5; 
+                });
+            } else {
+                logoMat.map = createTextTexture(CONFIG.introLogoText, 2048, 512, 'transparent', '#ffffff', false, true);
+            }
             logoPlane.position.set(0, 0, 30); // Start way in front of the shelf
             scene.add(logoPlane);
 
@@ -502,16 +507,21 @@
 
             const textPlanes = [];
             services.forEach((service, i) => {
-                let mat;
-                if (service.image) {
-                    const tex = textureLoader.load(service.image);
-                    mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 });
-                } else {
-                    const tex = createTextTexture(service.text, 1024, 256, 'transparent', 'rgba(255,255,255,0.8)', false);
-                    mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 });
-                }
+                let mat = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0 });
                 const geo = new THREE.PlaneGeometry(16, 4);
                 const plane = new THREE.Mesh(geo, mat);
+
+                if (service.image) {
+                    textureLoader.load(service.image, (tex) => {
+                        mat.map = tex;
+                        mat.needsUpdate = true;
+                        // Dynamically scale floating images to prevent squeezing
+                        const imgAspect = tex.image.width / tex.image.height;
+                        plane.scale.y = (16 / imgAspect) / 4;
+                    });
+                } else {
+                    mat.map = createTextTexture(service.text, 1024, 256, 'transparent', 'rgba(255,255,255,0.8)', false);
+                }
                 
                 // Spiral distribution keeping the center tunnel clear
                 const zPos = -15 - (i * 12); // Paced to appear much sooner after the shelf
@@ -553,16 +563,22 @@
             // ----------------------------------
 
             // Final Glowing Pitch
-            let pitchMat;
-            if (CONFIG.finalPitchImage) {
-                const tex = textureLoader.load(CONFIG.finalPitchImage);
-                pitchMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
-            } else {
-                const pitchTex = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
-                pitchMat = new THREE.MeshBasicMaterial({ map: pitchTex, transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
-            }
+            let pitchMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
             const pitchGeo = new THREE.PlaneGeometry(35, 8.75); // 4:1 aspect
             const pitchPlane = new THREE.Mesh(pitchGeo, pitchMat);
+
+            if (CONFIG.finalPitchImage) {
+                textureLoader.load(CONFIG.finalPitchImage, (tex) => {
+                    pitchMat.map = tex;
+                    pitchMat.needsUpdate = true;
+                    // Dynamically scale final pitch image to prevent squeezing
+                    const imgAspect = tex.image.width / tex.image.height;
+                    pitchPlane.scale.y = (35 / imgAspect) / 8.75;
+                });
+            } else {
+                pitchMat.map = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
+            }
+            
             const finalZPos = -140; // Adjusted based on new text pacing
             pitchPlane.position.set(0, 0, finalZPos);
             scene.add(pitchPlane);
