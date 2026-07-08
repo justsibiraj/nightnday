@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Night & Day | Film Positioning</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -21,6 +21,8 @@
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             overflow-y: auto; 
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
         }
 
         /* Cinematic Vignette Overlay */
@@ -30,7 +32,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.85) 100%);
             z-index: 2;
             pointer-events: none;
         }
@@ -49,7 +51,7 @@
             position: relative;
             z-index: 3;
             width: 100%;
-            height: 600vh; /* Extended slightly for smoother pacing */
+            height: 600vh;
             pointer-events: none; 
         }
 
@@ -64,8 +66,14 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 1.5rem sm:padding: 2.5rem;
+            padding: 1rem;
             box-sizing: border-box;
+        }
+
+        @media (min-width: 640px) {
+            .ui-layer {
+                padding: 2.5rem;
+            }
         }
 
         .title-brand {
@@ -80,14 +88,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             opacity: 0.8;
             transition: opacity 0.5s ease;
+            margin-bottom: 1rem;
         }
 
         .mouse-icon {
-            width: 24px;
-            height: 36px;
+            width: 20px;
+            height: 32px;
             border: 2px solid white;
             border-radius: 12px;
             position: relative;
@@ -95,7 +104,7 @@
 
         .mouse-wheel {
             width: 4px;
-            height: 8px;
+            height: 6px;
             background: white;
             border-radius: 2px;
             position: absolute;
@@ -107,16 +116,16 @@
 
         @keyframes scrollWheel {
             0% { transform: translate(-50%, 0); opacity: 1; }
-            100% { transform: translate(-50%, 12px); opacity: 0; }
+            100% { transform: translate(-50%, 10px); opacity: 0; }
         }
 
         /* Progress Bar */
         .progress-container {
             position: fixed;
-            right: 2rem;
+            right: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            height: 40vh;
+            height: 30vh;
             width: 2px;
             background: rgba(255,255,255,0.1);
             z-index: 4;
@@ -124,33 +133,52 @@
 
         .progress-bar {
             width: 100%;
-            background: white;
+            background: #8ac53f;
             height: 0%;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            box-shadow: 0 0 10px rgba(138,197,63,0.5);
             transition: height 0.1s ease-out;
         }
 
-        /* Cassette Details UI (Dark Gray for enhanced distinction/contrast) */
+        /* Cassette Details UI */
         #cassette-details {
             position: fixed;
-            bottom: -200px;
+            bottom: -250px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            background: rgba(22, 22, 22, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 2rem 4rem;
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
+            background: rgba(14, 14, 14, 0.98);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 16px;
             border: 1px solid rgba(255,255,255,0.15);
-            border-bottom: none;
             text-align: center;
             transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: auto;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 640px) {
+            #cassette-details {
+                width: auto;
+                max-width: none;
+                padding: 2rem 4rem;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-radius: 16px 16px 0 0;
+            }
         }
 
         #cassette-details.visible {
-            bottom: 0;
+            bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            #cassette-details.visible {
+                bottom: 0;
+            }
         }
 
         /* Footer Section */
@@ -183,8 +211,8 @@
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border: 2px solid rgba(255,255,255,0.1);
             border-top: 2px solid white;
             border-radius: 50%;
@@ -200,7 +228,7 @@
     <!-- Loading Screen -->
     <div id="loader">
         <div class="spinner"></div>
-        <h1 class="text-sm tracking-[0.3em] font-light text-gray-300">INITIALIZING SCENE</h1>
+        <h1 class="text-xs tracking-[0.3em] font-light text-gray-300">INITIALIZING SCENE</h1>
     </div>
 
     <div class="vignette"></div>
@@ -212,75 +240,86 @@
 
     <!-- Static UI Layer -->
     <div class="ui-layer">
-        <header id="main-header" class="flex flex-row items-center justify-center gap-4 sm:gap-12 md:gap-16 lg:gap-24 w-full pointer-events-auto py-2 transition-opacity duration-1000 opacity-0">
+        <header id="main-header" class="flex flex-row items-center justify-between sm:justify-center gap-2 sm:gap-12 md:gap-16 w-full pointer-events-auto py-2 transition-opacity duration-1000 opacity-0 px-2 sm:px-0">
             <!-- Left Navigation Group -->
-            <div id="nav-left" class="flex items-center gap-4 sm:gap-8 md:gap-12 transition-opacity duration-500">
-                <a href="#projects" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'})">
+            <div id="nav-left" class="flex items-center gap-3 sm:gap-8 md:gap-12 transition-opacity duration-500">
+                <a href="#projects" class="text-[9px] sm:text-xs md:text-sm tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap" onclick="window.scrollTo({top: (document.body.scrollHeight - window.innerHeight) * 0.15, behavior: 'smooth'}); return false;">
                     Projects
                 </a>
-                <a href="#services" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
+                <a href="#services" class="text-[9px] sm:text-xs md:text-sm tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
                     Services
                 </a>
             </div>
             
-            <!-- Centralized Logo Container (30% larger, matches image_0f6bfd.png) -->
-            <div id="nav-logo-container" class="flex justify-center items-center px-4 md:px-10 transition-opacity duration-500">
+            <!-- Centralized Logo Container -->
+            <div id="nav-logo-container" class="flex justify-center items-center px-2 sm:px-10 transition-opacity duration-500 max-w-[40%] sm:max-w-none">
                 <img id="header-logo" src="ndw logo 00.png" alt="NIGHT & DAY" 
-                     class="h-[5.2rem] sm:h-[7.8rem] md:h-[10.4rem] lg:h-[11.7rem] w-auto max-w-[180px] sm:max-w-[310px] md:max-w-[470px] lg:max-w-[520px] object-contain transition-all duration-700 hover:scale-105 active:scale-95" 
-                     onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[1.3rem] sm:text-[2.1rem] md:text-[2.8rem] lg:text-[3.4rem] tracking-[0.3em] font-serif uppercase text-white font-bold transition-opacity duration-700 hover:text-[#8ac53f] transition-colors duration-300 px-2 text-center whitespace-nowrap';">
+                     class="h-[3.5rem] sm:h-[7.8rem] md:h-[10.4rem] w-auto max-w-full object-contain transition-all duration-700 hover:scale-105 active:scale-95" 
+                     onerror="this.onerror=null; this.src=''; this.alt='NIGHT & DAY'; this.className='text-[1rem] sm:text-[1.8rem] md:text-[2.2rem] tracking-[0.3em] font-serif uppercase text-white font-bold transition-opacity duration-700 hover:text-[#8ac53f] px-2 text-center whitespace-nowrap';">
             </div>
 
             <!-- Right Navigation Group -->
-            <div id="nav-right" class="flex items-center gap-4 sm:gap-8 md:gap-12 transition-opacity duration-500">
-                <a href="#team" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
+            <div id="nav-right" class="flex items-center gap-3 sm:gap-8 md:gap-12 transition-opacity duration-500">
+                <a href="#team" class="text-[9px] sm:text-xs md:text-sm tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
                     Team
                 </a>
-                <a href="#about" class="text-[10px] sm:text-xs md:text-sm tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
+                <a href="#about" class="text-[9px] sm:text-xs md:text-sm tracking-[0.2em] sm:tracking-[0.25em] text-white uppercase font-semibold hover:text-[#8ac53f] transition-all duration-300 hover:tracking-[0.3em] whitespace-nowrap">
                     About Us
                 </a>
             </div>
         </header>
 
-        <!-- Handwritten Intro Text Overlay (Shifted higher to prevent overlap, matches image_0fcd99.png) -->
-        <div id="intro-handwritten-text-container" class="absolute inset-x-0 top-[6%] sm:top-[8%] flex flex-col items-center justify-center pointer-events-none z-[5]">
-            <!-- Text 1: The Beginning -->
-            <p id="intro-text-1" class="text-white text-xl sm:text-2xl md:text-4xl lg:text-5xl font-light tracking-widest text-center px-6 transition-opacity duration-300" style="font-family: 'Caveat', cursive;">
+        <!-- Handwritten Intro Text Overlay -->
+        <div id="intro-handwritten-text-container" class="absolute inset-x-0 top-[12%] sm:top-[8%] flex flex-col items-center justify-center pointer-events-none z-[5]">
+            <p id="intro-text-1" class="text-white text-lg sm:text-2xl md:text-4xl lg:text-5xl font-light tracking-widest text-center px-6 transition-opacity duration-300" style="font-family: 'Caveat', cursive;">
                 it all begins with a dot
             </p>
         </div>
         
         <div class="scroll-indicator" id="scroll-hint">
-            <div class="mouse-icon"><div class="mouse-wheel"></div></div>
-            <span class="text-[0.65rem] tracking-[0.3em] uppercase">Scroll to explore</span>
+            <div class="mouse-icon" id="hint-icon"><div class="mouse-wheel"></div></div>
+            <span class="text-[0.6rem] sm:text-[0.65rem] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-center" id="hint-text">Scroll to explore</span>
         </div>
 
         <!-- Campaign Hint -->
-        <div id="campaign-hint" class="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 text-[0.65rem] tracking-[0.2em] text-gray-300 uppercase opacity-0 transition-opacity duration-700 pointer-events-none text-center drop-shadow-md w-full">
-            Click for campaign details
+        <div id="campaign-hint" class="absolute bottom-[14%] sm:bottom-[10%] left-1/2 transform -translate-x-1/2 text-[0.6rem] sm:text-[0.65rem] tracking-[0.2em] text-gray-300 uppercase opacity-0 transition-opacity duration-700 pointer-events-none text-center drop-shadow-md w-full px-4">
+            Tap a cassette for details
         </div>
     </div>
 
     <!-- Scroll Progress -->
     <div class="progress-container">
-        <div class="progress-bar bg-[#8ac53f] shadow-[0_0_10px_rgba(138,197,63,0.5)]" id="progress-bar"></div>
+        <div class="progress-bar" id="progress-bar"></div>
     </div>
 
     <!-- Dynamic Cassette Details -->
     <div id="cassette-details">
-        <h3 id="cd-title" class="font-serif text-2xl tracking-[0.15em] text-white mb-3 uppercase">Title</h3>
-        <p id="cd-activities" class="text-sm tracking-wider text-gray-400 font-light"></p>
+        <h3 id="cd-title" class="font-serif text-xl sm:text-2xl tracking-[0.15em] text-white mb-2 sm:mb-3 uppercase">Title</h3>
+        <p id="cd-activities" class="text-xs sm:text-sm tracking-wider text-gray-400 font-light"></p>
     </div>
 
     <!-- Final Footer Section -->
     <div class="footer-section">
-        <button class="px-10 py-5 bg-white text-black font-bold tracking-[0.2em] text-sm uppercase rounded-full hover:scale-105 hover:shadow-[0_0_25px_rgba(138,197,63,0.4)] transition-all duration-300">
+        <button class="px-8 py-4 sm:px-10 sm:py-5 bg-white text-black font-bold tracking-[0.2em] text-xs sm:text-sm uppercase rounded-full hover:scale-105 hover:shadow-[0_0_25px_rgba(138,197,63,0.4)] transition-all duration-300 active:scale-95">
             Connect With Us
         </button>
     </div>
 
     <script>
         window.onload = function() {
-            // Remove loader gracefully
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            
+            // Adjust visual hints for mobile touch interactions
+            if(isTouchDevice) {
+                const hintText = document.getElementById('hint-text');
+                const hintIcon = document.getElementById('hint-icon');
+                const campaignHint = document.getElementById('campaign-hint');
+                if(hintText) hintText.innerText = "Swipe to explore";
+                if(hintIcon) hintIcon.style.display = "none";
+                if(campaignHint) campaignHint.innerText = "Tap a cassette for details";
+            }
+
+            // Loader hand-off
             setTimeout(() => {
                 const loader = document.getElementById('loader');
                 loader.style.opacity = '0';
@@ -290,43 +329,46 @@
             // Three.js Core Setup
             const canvas = document.getElementById('webgl-canvas');
             const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x030303, 0.012); // Slightly deeper fog
+            scene.fog = new THREE.FogExp2(0x030303, 0.012);
 
-            // --- CENTRAL CONFIGURATION ---
             const CONFIG = {
                 introLogoText: "NIGHT & DAY",
                 introLogoImage: "ndw logo 00.png",
-                finalPitchText: "NIGHT & DAY", // Final logo backup text
-                finalPitchImage: "ndw logo 00.png", // Direct reference to prevent squishing of your brand logo!
+                finalPitchText: "NIGHT & DAY",
+                finalPitchImage: "ndw logo 00.png",
                 fontPrimary: '"Inter", sans-serif',
                 fontSecondary: '"Cinzel", serif'
             };
-            // -----------------------------
 
             const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
             
             const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.enabled = !isTouchDevice; // Disable shadows on touch to maximize frames
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             renderer.toneMappingExposure = 1.0;
 
-            // Advanced dynamic texture generator
+            // Highly performant, dynamic texture builder
             function createTextTexture(title, width, height, bgColor, textColor, isSpine = false, isGlow = false) {
+                // Lower texture map size slightly on mobile for rendering optimization
+                const scale = window.innerWidth < 640 ? 0.5 : 1;
+                const canvasW = width * scale;
+                const canvasH = height * scale;
+
                 const ctxCanvas = document.createElement('canvas');
-                ctxCanvas.width = width;
-                ctxCanvas.height = height;
+                ctxCanvas.width = canvasW;
+                ctxCanvas.height = canvasH;
                 const ctx = ctxCanvas.getContext('2d');
 
                 ctx.fillStyle = bgColor;
-                ctx.fillRect(0, 0, width, height);
+                ctx.fillRect(0, 0, canvasW, canvasH);
 
                 if (bgColor !== 'transparent') {
-                    for(let i=0; i< (width*height)*0.05; i++) {
-                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
-                        ctx.fillRect(Math.random()*width, Math.random()*height, 2, 2);
+                    for(let i=0; i< (canvasW*canvasH)*0.03; i++) {
+                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)';
+                        ctx.fillRect(Math.random()*canvasW, Math.random()*canvasH, 1, 1);
                     }
                 }
 
@@ -336,100 +378,54 @@
                 
                 if (isGlow) {
                     ctx.shadowColor = textColor;
-                    ctx.shadowBlur = 50;
-                    ctx.font = `bold 100px ${CONFIG.fontSecondary}`;
+                    ctx.shadowBlur = 30 * scale;
+                    ctx.font = `bold ${70 * scale}px ${CONFIG.fontSecondary}`;
                 } else {
-                    ctx.font = isSpine ? `bold 36px ${CONFIG.fontPrimary}` : `900 80px ${CONFIG.fontPrimary}`;
+                    ctx.font = isSpine ? `bold ${28 * scale}px ${CONFIG.fontPrimary}` : `900 ${64 * scale}px ${CONFIG.fontPrimary}`;
                 }
 
                 if (isSpine) {
                     ctx.save();
-                    ctx.translate(width / 2, height / 2);
+                    ctx.translate(canvasW / 2, canvasH / 2);
                     ctx.rotate(-Math.PI / 2);
                     ctx.fillText(title, 0, 0);
                     ctx.restore();
                     
-                    ctx.font = '14px Arial';
-                    ctx.fillText('N&D', width / 2, height - 30);
-                    ctx.fillStyle = textColor;
-                    ctx.fillRect(width/2 - 20, 30, 40, 2);
+                    ctx.font = `${11 * scale}px Arial`;
+                    ctx.fillText('N&D', canvasW / 2, canvasH - (20 * scale));
                 } else {
                     if (!isGlow && bgColor !== 'transparent') {
                         ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                        ctx.lineWidth = 4;
-                        ctx.strokeRect(20, 20, width - 40, height - 40);
-                        ctx.fillText(title, width / 2, height / 2 - 40);
-                        
-                        ctx.font = '300 16px "Inter", sans-serif';
-                        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                        ctx.fillText('A NIGHT & DAY STUDIOS PRODUCTION', width / 2, height / 2 + 60);
-                        
-                        ctx.fillStyle = '#fff';
-                        for(let i=0; i<15; i++) {
-                            let w = Math.random() * 6 + 1;
-                            ctx.fillRect(40 + (i * 10), height - 70, w, 30);
-                        }
-                        ctx.font = 'bold 20px Arial';
-                        ctx.fillText('R', width - 60, height - 55);
-                        ctx.strokeStyle = '#fff';
                         ctx.lineWidth = 2;
-                        ctx.strokeRect(width - 75, height - 72, 30, 30);
+                        ctx.strokeRect(10, 10, canvasW - 20, canvasH - 20);
+                        ctx.fillText(title, canvasW / 2, canvasH / 2 - (20 * scale));
+                        
+                        ctx.font = `300 ${12 * scale}px "Inter", sans-serif`;
+                        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        ctx.fillText('A NIGHT & DAY STUDIOS PRODUCTION', canvasW / 2, canvasH / 2 + (40 * scale));
                     } else {
-                        ctx.fillText(title, width / 2, height / 2);
+                        ctx.fillText(title, canvasW / 2, canvasH / 2);
                     }
                 }
 
                 const texture = new THREE.CanvasTexture(ctxCanvas);
-                texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
                 return texture;
             }
 
             const textureLoader = new THREE.TextureLoader();
-
             const shelfGroup = new THREE.Group();
             scene.add(shelfGroup);
 
             const films = [
-                { 
-                    title: 'YOUTH', color: '#8c593b', 
-                    coverImage: "youth poster ndw.jpg" , spineImage: null,
-                    activities: "Global Strategy • Audience Building • Trailer Positioning" 
-                },
-                { 
-                    title: 'LOVE TODAY', color: '#1a1a1a', 
-                    coverImage: "love today poster ndw.jpg", spineImage: null,
-                    activities: "Digital Campaigns • IMAX Partnerships • Cultural Relevance" 
-                },
-                { 
-                    title: 'BLAST', color: '#2a3b2c', 
-                    coverImage: "blast poster ndw.jpg", spineImage: null,
-                    activities: "Word of Mouth • Press Narrative • Oscar Campaign Strategy" 
-                },
-                { 
-                    title: 'PARASAKTHI', color: '#0d1321', 
-                    coverImage: "parasakthi poster ndw.jpg", spineImage: null,
-                    activities: "Brand Partnerships • Data Analytics • Influencer Network" 
-                },
-                { 
-                    title: 'YOUTH', color: '#4a0e0e', 
-                    coverImage: "youth poster ndw.jpg", spineImage: null,
-                    activities: "Creative Direction • Meme Marketing • Global Scale Rollout" 
-                },
-                { 
-                    title: 'RETRO', color: '#421a42', 
-                    coverImage: "retro poster ndw.jpg", spineImage: null,
-                    activities: "Viral Marketing • Community Engagement • Award Strategy" 
-                },
-                { 
-                    title: 'BLAST', color: '#8a2b5b', 
-                    coverImage: "blast poster ndw.jpg", spineImage: null,
-                    activities: "Brand Collaborations • Social Dominance • Event Activations" 
-                },
-                { 
-                    title: 'PARASAKTHI', color: '#7a3e14', 
-                    coverImage: "parasakthi poster ndw.jpg", spineImage: null,
-                    activities: "Teaser Campaign • Visual Storytelling • Niche Targeting" 
-                }
+                { title: 'YOUTH', color: '#8c593b', coverImage: "youth poster ndw.jpg", activities: "Global Strategy • Audience Building • Trailer Positioning" },
+                { title: 'LOVE TODAY', color: '#1a1a1a', coverImage: "love today poster ndw.jpg", activities: "Digital Campaigns • IMAX Partnerships • Cultural Relevance" },
+                { title: 'BLAST', color: '#2a3b2c', coverImage: "blast poster ndw.jpg", activities: "Word of Mouth • Press Narrative • Oscar Campaign Strategy" },
+                { title: 'PARASAKTHI', color: '#0d1321', coverImage: "parasakthi poster ndw.jpg", activities: "Brand Partnerships • Data Analytics • Influencer Network" },
+                { title: 'YOUTH', color: '#4a0e0e', coverImage: "youth poster ndw.jpg", activities: "Creative Direction • Meme Marketing • Global Scale Rollout" },
+                { title: 'RETRO', color: '#421a42', coverImage: "retro poster ndw.jpg", activities: "Viral Marketing • Community Engagement • Award Strategy" },
+                { title: 'BLAST', color: '#8a2b5b', coverImage: "blast poster ndw.jpg", activities: "Brand Collaborations • Social Dominance • Event Activations" },
+                { title: 'PARASAKTHI', color: '#7a3e14', coverImage: "parasakthi poster ndw.jpg", activities: "Teaser Campaign • Visual Storytelling • Niche Targeting" }
             ];
 
             const cassettes = [];
@@ -440,120 +436,88 @@
             const startX = -((films.length - 1) * spacing) / 2;
 
             const plasticMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x0a0a0a, 
-                roughness: 0.8, 
-                metalness: 0.3,
-                transparent: true,
-                opacity: 0
+                color: 0x0a0a0a, roughness: 0.8, metalness: 0.3, transparent: true, opacity: 0
             });
 
             films.forEach((film, index) => {
                 const geometry = new THREE.BoxGeometry(cassetteWidth, cassetteHeight, cassetteDepth);
-                let spineTexture, coverTexture;
-
-                if (film.spineImage) {
-                    spineTexture = textureLoader.load(film.spineImage);
-                } else {
-                    spineTexture = createTextTexture(film.title, 128, 512, '#111', '#ffffff', true);
-                }
+                let spineTexture = createTextTexture(film.title, 128, 512, '#111', '#ffffff', true);
+                let coverTexture = createTextTexture(film.title, 512, 768, film.color, '#ffffff', false);
 
                 if (film.coverImage) {
-                    coverTexture = textureLoader.load(film.coverImage);
-                } else {
-                    coverTexture = createTextTexture(film.title, 512, 768, film.color, '#ffffff', false);
+                    textureLoader.load(film.coverImage, (tex) => {
+                        coverMaterial.map = tex;
+                        coverMaterial.needsUpdate = true;
+                    }, undefined, (err) => {
+                        console.warn("Falling back to text-generated textures.");
+                    });
                 }
 
                 const spineMaterial = new THREE.MeshStandardMaterial({ map: spineTexture, roughness: 0.4, transparent: true, opacity: 0 });
                 const coverMaterial = new THREE.MeshStandardMaterial({ map: coverTexture, roughness: 0.3, transparent: true, opacity: 0 });
-
                 const materials = [ coverMaterial, plasticMaterial, plasticMaterial, plasticMaterial, spineMaterial, plasticMaterial ];
 
                 const cassette = new THREE.Mesh(geometry, materials);
-                cassette.castShadow = true;
-                cassette.receiveShadow = true;
-
                 const xPos = startX + (index * spacing);
                 cassette.position.set(xPos, 0, 0);
                 
                 cassette.userData = {
                     baseX: xPos, baseY: 0, baseZ: 0, baseRotY: 0,
-                    targetZ: 0, targetRotY: 0,
-                    state: 'idle',
-                    title: film.title,
-                    activities: film.activities
+                    state: 'idle', title: film.title, activities: film.activities
                 };
 
                 shelfGroup.add(cassette);
                 cassettes.push(cassette);
             });
 
-            // Add a subtle shelf base
+            // Shelf Base Model
             const shelfGeo = new THREE.BoxGeometry(14, 0.2, 4);
             const shelfMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.9, transparent: true, opacity: 0 });
             const shelfMesh = new THREE.Mesh(shelfGeo, shelfMat);
             shelfMesh.position.set(0, -2.2, 0);
-            shelfMesh.receiveShadow = true;
             shelfGroup.add(shelfMesh);
 
-            // --- CINEMATIC INTRO TUNNEL ---
+            // Intro portal plane elements
             const introBgGeo = new THREE.PlaneGeometry(50, 7);
             const introBgMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1.0 }); 
             const introBgPlane = new THREE.Mesh(introBgGeo, introBgMat);
             introBgPlane.position.set(0, 0, 30); 
             scene.add(introBgPlane);
 
-            // Dynamic transition circle
-            const dotGeo = new THREE.CircleGeometry(0.3, 64);
+            const dotGeo = new THREE.CircleGeometry(0.3, 32);
             const dotMat = new THREE.MeshBasicMaterial({ color: 0x030303, transparent: true, opacity: 1.0 });
             const dotMesh = new THREE.Mesh(dotGeo, dotMat);
             dotMesh.position.set(0, 0, 30.1); 
             scene.add(dotMesh);
 
             const services = [
-                { text: "Strategy & Positioning", image: null }, 
-                { text: "Digital Campaigns", image: null }, 
-                { text: "Cultural Relevance", image: null }, 
-                { text: "Audience Building", image: null }, 
-                { text: "Data Analytics", image: null }, 
-                { text: "Creative Direction", image: null }, 
-                { text: "Influencer Network", image: null }, 
-                { text: "Brand Partnerships", image: null }, 
-                { text: "Global Scale", image: null }
+                { text: "Strategy & Positioning" }, { text: "Digital Campaigns" }, { text: "Cultural Relevance" }, 
+                { text: "Audience Building" }, { text: "Data Analytics" }, { text: "Creative Direction" }, 
+                { text: "Influencer Network" }, { text: "Brand Partnerships" }, { text: "Global Scale" }
             ];
 
             const textPlanes = [];
             services.forEach((service, i) => {
                 let mat = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0 });
-                const geo = new THREE.PlaneGeometry(16, 4);
+                const geo = new THREE.PlaneGeometry(12, 3);
                 const plane = new THREE.Mesh(geo, mat);
-
-                if (service.image) {
-                    textureLoader.load(service.image, (tex) => {
-                        mat.map = tex;
-                        mat.needsUpdate = true;
-                        const imgAspect = tex.image.width / tex.image.height;
-                        plane.scale.y = (16 / imgAspect) / 4;
-                    });
-                } else {
-                    mat.map = createTextTexture(service.text, 1024, 256, 'transparent', 'rgba(255,255,255,0.8)', false);
-                }
+                mat.map = createTextTexture(service.text, 1024, 256, 'transparent', 'rgba(255,255,255,0.85)', false);
                 
                 const zPos = -15 - (i * 12);
                 const angle = i * Math.PI * 0.7;
-                const radius = 6 + Math.random() * 6;
+                const radius = window.innerWidth < 640 ? 4 + Math.random() * 3 : 6 + Math.random() * 6;
                 const xPos = Math.cos(angle) * radius;
-                const yPos = Math.sin(angle) * radius * 0.6;
+                const yPos = Math.sin(angle) * radius * 0.5;
                 
                 plane.position.set(xPos, yPos, zPos);
                 plane.lookAt(0, 0, zPos + 10);
-                
                 scene.add(plane);
                 textPlanes.push({ mesh: plane, baseY: yPos, targetY: yPos });
             });
 
-            // --- HYPERSPACE STARFIELD ---
-            const starCount = 600;
-            const starGeo = new THREE.BoxGeometry(0.05, 0.05, 2);
+            // Optimized dynamic starfield counts
+            const starCount = window.innerWidth < 640 ? 250 : 500;
+            const starGeo = new THREE.BoxGeometry(0.04, 0.04, 2);
             const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
             const starMesh = new THREE.InstancedMesh(starGeo, starMat, starCount);
             
@@ -561,71 +525,47 @@
             const starData = [];
             for(let i=0; i<starCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const radius = 3 + Math.random() * 25;
+                const radius = 2 + Math.random() * 20;
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
-                const z = -Math.random() * 250;
-                const speed = 0.5 + Math.random() * 1.0;
-                starData.push({x, y, z, speed});
-                
+                const z = -Math.random() * 200;
+                starData.push({x, y, z, speed: 0.5 + Math.random() * 0.8});
                 dummy.position.set(x, y, z);
                 dummy.updateMatrix();
                 starMesh.setMatrixAt(i, dummy.matrix);
             }
             scene.add(starMesh);
 
-            // Final Glowing Pitch Plane Setup
             let pitchMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, opacity: 0 });
-            const pitchGeo = new THREE.PlaneGeometry(35, 8.75); // base 4:1 aspect geometry
+            const pitchGeo = new THREE.PlaneGeometry(30, 7.5);
             const pitchPlane = new THREE.Mesh(pitchGeo, pitchMat);
-
-            // Aspect ratio protection state!
-            pitchPlane.userData = {
-                baseScaleX: 1.0,
-                baseScaleY: 1.0,
-                baseScaleZ: 1.0
-            };
+            pitchPlane.userData = { baseScaleX: 1.0, baseScaleY: 1.0 };
 
             if (CONFIG.finalPitchImage) {
                 textureLoader.load(CONFIG.finalPitchImage, (tex) => {
                     pitchMat.map = tex;
                     pitchMat.needsUpdate = true;
-                    
-                    // Prevent squishing by adjusting geometry scale multipliers based on actual file parameters!
                     const imgAspect = tex.image.width / tex.image.height;
-                    const targetHeight = 35 / imgAspect;
-                    
-                    // Store proportions securely in userData so render loop transformations respect them
-                    pitchPlane.userData.baseScaleY = targetHeight / 8.75;
+                    const targetHeight = 30 / imgAspect;
+                    pitchPlane.userData.baseScaleY = targetHeight / 7.5;
                     pitchPlane.scale.set(pitchPlane.userData.baseScaleX, pitchPlane.userData.baseScaleY, 1.0);
+                }, undefined, () => {
+                    pitchMat.map = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
                 });
             } else {
                 pitchMat.map = createTextTexture(CONFIG.finalPitchText, 2048, 512, 'transparent', '#ffffff', false, true);
             }
-            
-            const finalZPos = -140;
-            pitchPlane.position.set(0, 0, finalZPos);
+            pitchPlane.position.set(0, 0, -140);
             scene.add(pitchPlane);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-            scene.add(ambientLight);
-
-            const spotLight = new THREE.SpotLight(0xffffff, 2.5);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+            const spotLight = new THREE.SpotLight(0xffffff, 2.0);
             spotLight.position.set(5, 10, 10);
-            spotLight.angle = Math.PI / 4;
-            spotLight.penumbra = 0.8;
-            spotLight.castShadow = true;
-            spotLight.shadow.mapSize.width = 1024;
-            spotLight.shadow.mapSize.height = 1024;
             scene.add(spotLight);
 
-            const rimLight = new THREE.PointLight(0x8ac53f, 3, 40);
-            rimLight.position.set(-8, -2, -5);
+            const rimLight = new THREE.PointLight(0x8ac53f, 2.5, 30);
+            rimLight.position.set(-6, -2, -5);
             scene.add(rimLight);
-            
-            const fillLight = new THREE.PointLight(0xffaa55, 1, 30);
-            fillLight.position.set(8, 2, 5);
-            scene.add(fillLight);
 
             const raycaster = new THREE.Raycaster();
             const mouse = new THREE.Vector2();
@@ -636,48 +576,48 @@
             const cdTitle = document.getElementById('cd-title');
             const cdActivities = document.getElementById('cd-activities');
 
-            window.addEventListener('mousemove', (event) => {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-                
+            function updateMouseCoords(clientX, clientY) {
+                mouse.x = (clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            }
+
+            window.addEventListener('mousemove', (e) => {
+                if (isTouchDevice) return;
+                updateMouseCoords(e.clientX, e.clientY);
+                handleHoverState();
+            });
+
+            function handleHoverState() {
                 if (scrollProgress >= 0.1 && scrollProgress < 0.3) {
                     raycaster.setFromCamera(mouse, camera);
                     const intersects = raycaster.intersectObjects(cassettes);
-                    
-                    cassettes.forEach(c => {
-                        if (c.userData.state === 'hover') c.userData.state = 'idle';
-                    });
-
+                    cassettes.forEach(c => { if (c.userData.state === 'hover') c.userData.state = 'idle'; });
                     if (intersects.length > 0) {
                         document.body.style.cursor = 'pointer';
-                        const hovered = intersects[0].object;
-                        if (hovered.userData.state !== 'active') {
-                            hovered.userData.state = 'hover';
+                        if (intersects[0].object.userData.state !== 'active') {
+                            intersects[0].object.userData.state = 'hover';
                         }
                     } else {
                         document.body.style.cursor = 'default';
                     }
-                } else {
-                    document.body.style.cursor = 'default';
                 }
-            });
+            }
 
-            window.addEventListener('click', () => {
+            // Unified action wrapper for tap/click interactions
+            function performInteraction(clientX, clientY) {
                 if (scrollProgress < 0.1 || scrollProgress > 0.3) return;
-
+                updateMouseCoords(clientX, clientY);
                 raycaster.setFromCamera(mouse, camera);
                 const intersects = raycaster.intersectObjects(cassettes);
 
                 if (intersects.length > 0) {
                     const clicked = intersects[0].object;
-                    
                     if (clicked.userData.state === 'active') {
                         clicked.userData.state = 'idle';
                         cdUI.classList.remove('visible');
                     } else {
                         cassettes.forEach(c => c.userData.state = 'idle');
                         clicked.userData.state = 'active';
-                        
                         cdTitle.innerText = clicked.userData.title;
                         cdActivities.innerText = clicked.userData.activities;
                         cdUI.classList.add('visible');
@@ -686,6 +626,16 @@
                     cassettes.forEach(c => c.userData.state = 'idle');
                     cdUI.classList.remove('visible');
                 }
+            }
+
+            window.addEventListener('click', (e) => {
+                if(isTouchDevice) return;
+                performInteraction(e.clientX, e.clientY);
+            });
+
+            window.addEventListener('pointerdown', (e) => {
+                if(!isTouchDevice) return;
+                performInteraction(e.clientX, e.clientY);
             });
 
             let scrollProgress = 0;
@@ -694,24 +644,19 @@
             window.addEventListener('scroll', () => {
                 const maxScroll = document.body.scrollHeight - window.innerHeight;
                 targetScrollProgress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
-                
                 progressBar.style.height = `${targetScrollProgress * 100}%`;
-                if (targetScrollProgress > 0.02) {
-                    scrollHint.style.opacity = '0';
-                } else {
-                    scrollHint.style.opacity = '0.8';
-                }
-            });
+                scrollHint.style.opacity = targetScrollProgress > 0.02 ? '0' : '0.8';
+            }, { passive: true });
 
-            window.addEventListener('resize', () => {
+            function adaptToViewport() {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            function lerp(start, end, factor) {
-                return start + (end - start) * factor;
             }
+            window.addEventListener('resize', adaptToViewport);
+            adaptToViewport();
+
+            function lerp(start, end, factor) { return start + (end - start) * factor; }
 
             const clock = new THREE.Clock();
             let lastScrollProgress = 0;
@@ -721,11 +666,11 @@
                 requestAnimationFrame(animate);
                 const elapsedTime = clock.getElapsedTime();
 
-                scrollProgress = lerp(scrollProgress, targetScrollProgress, 0.07);
+                scrollProgress = lerp(scrollProgress, targetScrollProgress, 0.08);
                 const scrollDelta = Math.abs(scrollProgress - lastScrollProgress);
                 lastScrollProgress = scrollProgress;
 
-                // --- HEADER ELEMENTS CONTROL LOGIC ---
+                // UI Elements state changes
                 const header = document.getElementById('main-header');
                 const navLeft = document.getElementById('nav-left');
                 const navRight = document.getElementById('nav-right');
@@ -733,111 +678,79 @@
 
                 if (header && navLeft && navRight && logoContainer) {
                     if (scrollProgress < 0.09) {
-                        // Intro phase (Everything hidden)
                         header.style.opacity = '0';
                         header.style.pointerEvents = 'none';
                     } else if (scrollProgress >= 0.09 && scrollProgress < 0.28) {
-                        // Bookshelf Phase (Show menu + logo 30% faster than before)
                         header.style.opacity = '1';
                         header.style.pointerEvents = 'auto';
                         navLeft.style.opacity = '1';
                         navRight.style.opacity = '1';
                         logoContainer.style.opacity = '1';
                     } else if (scrollProgress >= 0.28 && scrollProgress < 0.85) {
-                        // Warp Space Flight (Hide completely)
                         header.style.opacity = '0';
                         header.style.pointerEvents = 'none';
                     } else {
-                        // Footer Phase (Reappear text links, BUT keep the logo container hidden)
                         header.style.opacity = '1';
                         header.style.pointerEvents = 'auto';
-                        navLeft.style.opacity = '1';
-                        navRight.style.opacity = '1';
                         logoContainer.style.opacity = '0';
                     }
                 }
 
-                // --- CAMPAIGN HINT LOGIC ---
                 const campaignHint = document.getElementById('campaign-hint');
-                if (scrollProgress >= 0.14 && scrollProgress <= 0.26) {
-                    campaignHint.style.opacity = '1';
-                } else {
-                    campaignHint.style.opacity = '0';
+                if (campaignHint) {
+                    campaignHint.style.opacity = (scrollProgress >= 0.14 && scrollProgress <= 0.26) ? '1' : '0';
                 }
 
-                // --- SINGLE STAGE TYPOGRAPHY TIMELINE ---
                 const text1 = document.getElementById('intro-text-1');
-                
                 if (scrollProgress < 0.03) {
-                    const opacity1 = Math.max(0, 1 - (scrollProgress / 0.03));
-                    if (text1) text1.style.opacity = opacity1.toString();
+                    if (text1) text1.style.opacity = (1 - (scrollProgress / 0.03)).toString();
                 } else {
                     if (text1) text1.style.opacity = '0';
                 }
 
-                // --- CAMERA & PORTAL TRANSITION LOGIC ---
+                // Portrait Mode Aspect Correction
+                const isPortrait = window.innerHeight > window.innerWidth;
+                let shelfBaseZ = isPortrait ? 18 : 12;
+
                 let targetCamZ = 45; 
                 let targetCamY = 0;
                 let targetCamX = 0;
-                
                 let targetTunnelOpacity = 1.0;
                 let targetTunnelScale = 1;
 
                 if (scrollProgress < 0.15) {
                     const localProg = scrollProgress / 0.15;
                     const camEase = 1 - Math.pow(1 - localProg, 3); 
-
-                    targetCamZ = 45 - (camEase * 33); 
+                    targetCamZ = 45 - (camEase * (45 - shelfBaseZ)); 
                     targetTunnelScale = 1 + (camEase * 40); 
-
                     const dotScale = 1 + Math.pow(localProg, 4) * 160;
                     dotMesh.scale.set(dotScale, dotScale, 1);
-                    dotMesh.material.opacity = 1.0;
-
-                    if (scrollProgress > 0.03) {
-                        const fadeProg = Math.min(1, (scrollProgress - 0.03) / 0.12);
-                        const alphaEase = Math.pow(fadeProg, 2); 
-                        targetTunnelOpacity = 1.0 - alphaEase;
-                    } else {
-                        targetTunnelOpacity = 1.0;
-                    }
+                    targetTunnelOpacity = scrollProgress > 0.03 ? 1.0 - Math.pow((scrollProgress - 0.03) / 0.12, 2) : 1.0;
                 } 
                 else if (scrollProgress >= 0.15 && scrollProgress < 0.3) {
-                    targetCamZ = 12;
+                    targetCamZ = shelfBaseZ;
                     targetTunnelOpacity = 0;
                     dotMesh.scale.set(0.001, 0.001, 1);
-                    dotMesh.material.opacity = 0;
                 }
                 else if (scrollProgress >= 0.3 && scrollProgress < 0.75) {
                     const localProg = (scrollProgress - 0.3) / 0.45;
                     const easeProg = localProg < 0.5 ? 2 * localProg * localProg : 1 - Math.pow(-2 * localProg + 2, 2) / 2;
-                    
-                    targetCamZ = 12 - (easeProg * 132); 
-                    targetCamY = 0; 
-                    targetCamX = 0; 
+                    targetCamZ = shelfBaseZ - (easeProg * (132 + shelfBaseZ)); 
                 } 
                 else if (scrollProgress >= 0.75 && scrollProgress < 0.85) {
                     const localProg = (scrollProgress - 0.75) / 0.10;
                     targetCamZ = -120 - (localProg * 6); 
-                    targetCamY = 0; 
-                    targetCamX = 0;
                 } 
                 else {
                     targetCamZ = -126;
-                    targetCamY = 0;
-                    targetCamX = 0;
                 }
 
-                camera.position.x = lerp(camera.position.x, targetCamX, 0.05);
-                camera.position.y = lerp(camera.position.y, targetCamY, 0.05);
-                camera.position.z = lerp(camera.position.z, targetCamZ, 0.05);
-
+                camera.position.z = lerp(camera.position.z, targetCamZ, 0.06);
                 camera.lookAt(0, 0, camera.position.z - 20);
 
                 introBgPlane.scale.y = lerp(introBgPlane.scale.y, targetTunnelScale, 0.1);
                 introBgPlane.material.opacity = lerp(introBgPlane.material.opacity, targetTunnelOpacity, 0.1);
 
-                // --- SHELF AND PRODUCT DISPERSION LOGIC ---
                 let targetShelfOpacity = (scrollProgress > 0.05) ? 1 : 0;
                 plasticMaterial.opacity = lerp(plasticMaterial.opacity, targetShelfOpacity, 0.05);
                 shelfMat.opacity = lerp(shelfMat.opacity, targetShelfOpacity, 0.05);
@@ -854,77 +767,49 @@
 
                     if (scrollProgress >= 0.28) {
                         const partProg = Math.min(1, (scrollProgress - 0.28) * 6); 
-                        let dir = Math.sign(ud.baseX);
-                        if (dir === 0) dir = idx % 2 === 0 ? 1 : -1; 
-                        
+                        let dir = Math.sign(ud.baseX) || (idx % 2 === 0 ? 1 : -1);
                         targetX = ud.baseX + (dir * partProg * 15);
                         targetRotY = ud.baseRotY + (dir * partProg * Math.PI / 2); 
-                        
                         ud.state = 'idle';
-                        cdUI.classList.remove('visible'); 
                     } else {
                         if (ud.state === 'active') {
-                            targetZ = 3.5;
+                            targetZ = isPortrait ? 5.5 : 3.5;
                             targetRotY = -Math.PI / 2;
                         } else if (ud.state === 'hover') {
                             targetZ = 0.5; 
-                            targetRotY = 0;
                         }
                     }
-
                     cassette.position.x = lerp(cassette.position.x, targetX, 0.1);
                     cassette.position.z = lerp(cassette.position.z, targetZ, 0.1);
                     cassette.rotation.y = lerp(cassette.rotation.y, targetRotY, 0.1);
                 });
                 
-                let targetShelfY = scrollProgress >= 0.28 ? -10 : -2.2;
-                shelfMesh.position.y = lerp(shelfMesh.position.y, targetShelfY, 0.1);
+                shelfMesh.position.y = lerp(shelfMesh.position.y, scrollProgress >= 0.28 ? -10 : -2.2, 0.1);
 
-                // --- FLOATING BRAND MESSAGES LOGIC ---
                 textPlanes.forEach((item, index) => {
-                    item.targetY = item.baseY + Math.sin(elapsedTime * 1.5 + index) * 0.8;
+                    item.targetY = item.baseY + Math.sin(elapsedTime * 1.2 + index) * 0.5;
                     item.mesh.position.y = lerp(item.mesh.position.y, item.targetY, 0.1);
                     
                     if (scrollProgress < 0.3) {
                         item.mesh.material.opacity = lerp(item.mesh.material.opacity, 0, 0.2);
                     } else {
                         const dist = item.mesh.position.z - camera.position.z;
-                        if (dist > 2 || dist < -35) {
-                            item.mesh.material.opacity = lerp(item.mesh.material.opacity, 0, 0.1);
-                        } else {
-                            item.mesh.material.opacity = lerp(item.mesh.material.opacity, 1, 0.05);
-                        }
+                        item.mesh.material.opacity = (dist > 2 || dist < -35) ? lerp(item.mesh.material.opacity, 0, 0.1) : lerp(item.mesh.material.opacity, 1, 0.05);
                     }
                 });
 
-                // --- DEEP WARP HYPERSPACE SPEED LOGIC ---
                 let isWarping = scrollProgress >= 0.28 && scrollProgress < 0.65;
-                let isDeepSpace = scrollProgress >= 0.28;
-                
-                let targetStarOpacity = 0;
-                if (isWarping) {
-                    targetStarOpacity = 0.6;
-                } else if (isDeepSpace) {
-                    targetStarOpacity = 0.3; 
-                }
-
-                starMat.opacity = lerp(starMat.opacity, targetStarOpacity, 0.05);
+                starMat.opacity = lerp(starMat.opacity, isWarping ? 0.6 : (scrollProgress >= 0.28 ? 0.3 : 0), 0.05);
                 
                 let baseWarpSpeed = isWarping ? 0.3 : 0.005; 
                 let activeWarpSpeed = baseWarpSpeed + (isWarping ? (scrollDelta * 50) : 0);
-
-                let targetZScale = isWarping ? (1 + activeWarpSpeed * 40) : 1;
-                currentStarStretch = lerp(currentStarStretch, targetZScale, 0.1);
+                currentStarStretch = lerp(currentStarStretch, isWarping ? (1 + activeWarpSpeed * 40) : 1, 0.1);
 
                 if (starMat.opacity > 0.01) {
                     for(let i=0; i<starCount; i++) {
                         let data = starData[i];
                         data.z += (data.speed * (isWarping ? 1 : 0.2)) + activeWarpSpeed; 
-                        
-                        if (data.z > camera.position.z) {
-                            data.z = camera.position.z - 250; 
-                        }
-                        
+                        if (data.z > camera.position.z) data.z = camera.position.z - 200; 
                         dummy.position.set(data.x, data.y, data.z);
                         dummy.scale.set(1, 1, currentStarStretch); 
                         dummy.updateMatrix();
@@ -933,18 +818,11 @@
                     starMesh.instanceMatrix.needsUpdate = true;
                 }
 
-                // --- FINAL GLOW LOGIC (Proportion-Safeguarded) ---
                 const distToFinal = pitchPlane.position.z - camera.position.z;
                 if (Math.abs(distToFinal) < 60) {
-                    const glowPulse = 0.7 + Math.sin(elapsedTime * 2) * 0.3;
-                    pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, glowPulse, 0.05);
-                    
-                    const scaleFactor = (scrollProgress > 0.75) ? (1 + ((scrollProgress - 0.75) * 0.4)) : 1.0;
-                    
-                    // Multiply target scale factor by base aspect ratio constants to ensure it NEVER squishes!
-                    const targetSX = pitchPlane.userData.baseScaleX * scaleFactor;
-                    const targetSY = pitchPlane.userData.baseScaleY * scaleFactor;
-                    pitchPlane.scale.set(targetSX, targetSY, scaleFactor);
+                    pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, 0.7 + Math.sin(elapsedTime * 2) * 0.3, 0.05);
+                    const scaleFactor = (scrollProgress > 0.75) ? (1 + ((scrollProgress - 0.75) * 0.3)) : 1.0;
+                    pitchPlane.scale.set(pitchPlane.userData.baseScaleX * scaleFactor, pitchPlane.userData.baseScaleY * scaleFactor, scaleFactor);
                 } else {
                     pitchPlane.material.opacity = lerp(pitchPlane.material.opacity, 0, 0.1);
                 }
